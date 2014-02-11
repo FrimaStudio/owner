@@ -8,17 +8,6 @@
 
 package org.aeonbits.owner;
 
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.net.URL;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -27,6 +16,17 @@ import static org.aeonbits.owner.Config.HotReloadType.SYNC;
 import static org.aeonbits.owner.Config.LoadType.FIRST;
 import static org.aeonbits.owner.Util.ignore;
 import static org.aeonbits.owner.Util.reverse;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Marker interface that must be implemented by all Config sub-interfaces.
@@ -101,8 +101,8 @@ public interface Config extends Serializable {
          */
         FIRST {
             @Override
-            Properties load(List<URL> urls, LoadersManager loaders) {
-                Properties result = new Properties();
+            Map<String, Object> load(List<URL> urls, LoadersManager loaders) {
+                Map<String, Object> result = new HashMap<String, Object>();
                 for (URL url : urls)
                     try {
                         loaders.load(result, url);
@@ -121,9 +121,9 @@ public interface Config extends Serializable {
          */
         MERGE {
             @Override
-            Properties load(List<URL> urls, LoadersManager loaders) {
-                Properties result = new Properties();
-                for (URL url :  reverse(urls))
+            Map<String, Object> load(List<URL> urls, LoadersManager loaders) {
+                Map<String, Object> result = new HashMap<String, Object>();
+                for (URL url : reverse(urls))
                     try {
                         loaders.load(result, url);
                     } catch (IOException ex) {
@@ -134,7 +134,7 @@ public interface Config extends Serializable {
             }
         };
 
-        abstract Properties load(List<URL> urls, LoadersManager loaders);
+        abstract Map<String, Object> load(List<URL> urls, LoadersManager loaders);
     }
 
     /**
@@ -234,7 +234,7 @@ public interface Config extends Serializable {
      * @since 1.0.4
      */
     @Retention(RUNTIME)
-    @Target({METHOD, TYPE})
+    @Target({ METHOD, TYPE })
     @Documented
     @interface DisableFeature {
         DisableableFeature[] value();
@@ -246,8 +246,7 @@ public interface Config extends Serializable {
      * @since 1.0.4
      */
     enum DisableableFeature {
-        VARIABLE_EXPANSION,
-        PARAMETER_FORMATTING
+        VARIABLE_EXPANSION, PARAMETER_FORMATTING
     }
 
     /**
@@ -272,7 +271,7 @@ public interface Config extends Serializable {
      * @since 1.0.4
      */
     @Retention(RUNTIME)
-    @Target({METHOD, TYPE})
+    @Target({ METHOD, TYPE })
     @Documented
     @interface Separator {
         /**
@@ -301,7 +300,7 @@ public interface Config extends Serializable {
      * @since 1.0.4
      */
     @Retention(RUNTIME)
-    @Target({METHOD, TYPE})
+    @Target({ METHOD, TYPE })
     @Documented
     @interface TokenizerClass {
         Class<? extends Tokenizer> value();

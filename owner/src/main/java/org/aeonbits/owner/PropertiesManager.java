@@ -8,14 +8,16 @@
 
 package org.aeonbits.owner;
 
-
-import org.aeonbits.owner.event.ReloadEvent;
-import org.aeonbits.owner.event.ReloadListener;
-import org.aeonbits.owner.event.RollbackBatchException;
-import org.aeonbits.owner.event.RollbackException;
-import org.aeonbits.owner.event.RollbackOperationException;
-import org.aeonbits.owner.event.TransactionalPropertyChangeListener;
-import org.aeonbits.owner.event.TransactionalReloadListener;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.util.Collections.synchronizedList;
+import static org.aeonbits.owner.Config.LoadType.FIRST;
+import static org.aeonbits.owner.PropertiesMapper.defaults;
+import static org.aeonbits.owner.Util.asString;
+import static org.aeonbits.owner.Util.eq;
+import static org.aeonbits.owner.Util.ignore;
+import static org.aeonbits.owner.Util.reverse;
+import static org.aeonbits.owner.Util.unsupported;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -47,16 +49,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static java.util.Collections.synchronizedList;
-import static org.aeonbits.owner.Config.LoadType.FIRST;
-import static org.aeonbits.owner.PropertiesMapper.defaults;
-import static org.aeonbits.owner.Util.asString;
-import static org.aeonbits.owner.Util.eq;
-import static org.aeonbits.owner.Util.ignore;
-import static org.aeonbits.owner.Util.reverse;
-import static org.aeonbits.owner.Util.unsupported;
+import org.aeonbits.owner.event.ReloadEvent;
+import org.aeonbits.owner.event.ReloadListener;
+import org.aeonbits.owner.event.RollbackBatchException;
+import org.aeonbits.owner.event.RollbackException;
+import org.aeonbits.owner.event.RollbackOperationException;
+import org.aeonbits.owner.event.TransactionalPropertyChangeListener;
+import org.aeonbits.owner.event.TransactionalReloadListener;
 
 /**
  * Loads properties and manages access to properties handling concurrency.
@@ -83,21 +82,20 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     private Object proxy;
     private final LoadersManager loaders;
 
-    final List<PropertyChangeListener> propertyChangeListeners = synchronizedList(
-            new LinkedList<PropertyChangeListener>() {
-                @Override
-                public boolean remove(Object o) {
-                    Iterator iterator = iterator();
-                    while (iterator.hasNext()) {
-                        Object item = iterator.next();
-                        if (item.equals(o)) {
-                            iterator.remove();
-                            return true;
-                        }
-                    }
-                    return false;
+    final List<PropertyChangeListener> propertyChangeListeners = synchronizedList(new LinkedList<PropertyChangeListener>() {
+        @Override
+        public boolean remove(Object o) {
+            Iterator iterator = iterator();
+            while (iterator.hasNext()) {
+                Object item = iterator.next();
+                if (item.equals(o)) {
+                    iterator.remove();
+                    return true;
                 }
-            });
+            }
+            return false;
+        }
+    });
 
     @Retention(RUNTIME)
     @Target(METHOD)
@@ -105,7 +103,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     }
 
     PropertiesManager(Class<? extends Config> clazz, Properties properties, ScheduledExecutorService scheduler,
-                      VariablesExpander expander, LoadersManager loaders, Map<?, ?>... imports) {
+            VariablesExpander expander, LoadersManager loaders, Map<?, ?>... imports) {
         this.clazz = clazz;
         this.properties = properties;
         this.loaders = loaders;
@@ -148,7 +146,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     }
 
     private String[] specs(Sources sources, ConfigURLFactory urlFactory) {
-        if (sources != null) return sources.value();
+        if (sources != null)
+            return sources.value();
         return defaultSpecs(urlFactory);
     }
 
@@ -170,7 +169,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         try {
             loading = true;
             defaults(props, clazz);
-            Properties loadedFromFile = doLoad();
+            Map<String, Object> loadedFromFile = doLoad();
             merge(props, loadedFromFile);
             merge(props, reverse(imports));
             return props;
@@ -184,8 +183,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         writeLock.lock();
         try {
             Properties loaded = load(new Properties());
-            List<PropertyChangeEvent> events =
-                    fireBeforePropertyChangeEvents(keys(properties, loaded), properties, loaded);
+            List<PropertyChangeEvent> events = fireBeforePropertyChangeEvents(keys(properties, loaded), properties,
+                    loaded);
             ReloadEvent reloadEvent = fireBeforeReloadEvent(events, properties, loaded);
             applyPropertyChangeEvents(events);
             firePropertyChangeEvents(events);
@@ -215,14 +214,13 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     }
 
     private ReloadEvent fireBeforeReloadEvent(List<PropertyChangeEvent> events, Properties oldProperties,
-                                              Properties newProperties) throws RollbackBatchException {
+            Properties newProperties) throws RollbackBatchException {
         ReloadEvent reloadEvent = new ReloadEvent(proxy, events, oldProperties, newProperties);
         for (ReloadListener listener : reloadListeners)
             if (listener instanceof TransactionalReloadListener)
                 ((TransactionalReloadListener) listener).beforeReload(reloadEvent);
         return reloadEvent;
     }
-
 
     @Delegate
     public void addReloadListener(ReloadListener listener) {
@@ -250,7 +248,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
 
     @Delegate
     public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
-        if (propertyName == null || listener == null) return;
+        if (propertyName == null || listener == null)
+            return;
 
         final boolean transactional = listener instanceof TransactionalPropertyChangeListener;
         propertyChangeListeners.add(new PropertyChangeListenerWrapper(propertyName, listener, transactional));
@@ -262,8 +261,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         private final PropertyChangeListener listener;
         private final boolean transactional;
 
-        public PropertyChangeListenerWrapper(String propertyName, PropertyChangeListener listener,
-                                             boolean transactional) {
+        public PropertyChangeListenerWrapper(String propertyName, PropertyChangeListener listener, boolean transactional) {
             this.propertyName = propertyName;
             this.listener = listener;
             this.transactional = transactional;
@@ -296,7 +294,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         }
     }
 
-    Properties doLoad() {
+    Map<String, Object> doLoad() {
         return loadType.load(urls, loaders);
     }
 
@@ -345,7 +343,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         readLock.lock();
         try {
             LinkedHashSet<String> result = new LinkedHashSet<String>();
-            for (Enumeration<?> propertyNames = properties.propertyNames(); propertyNames.hasMoreElements(); )
+            for (Enumeration<?> propertyNames = properties.propertyNames(); propertyNames.hasMoreElements();)
                 result.add((String) propertyNames.nextElement());
             return result;
         } finally {
@@ -389,7 +387,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         try {
             String oldValue = properties.getProperty(key);
             try {
-                if (eq(oldValue, newValue)) return oldValue;
+                if (eq(oldValue, newValue))
+                    return oldValue;
 
                 PropertyChangeEvent event = new PropertyChangeEvent(proxy, key, oldValue, newValue);
                 fireBeforePropertyChange(event);
@@ -405,9 +404,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     }
 
     private String performSetProperty(String key, Object value) {
-        return (value == null) ?
-                performRemoveProperty(key) :
-                asString(properties.setProperty(key, asString(value)));
+        return (value == null) ? performRemoveProperty(key) : asString(properties.setProperty(key, asString(value)));
     }
 
     @Delegate
@@ -436,8 +433,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     public void clear() {
         writeLock.lock();
         try {
-            List<PropertyChangeEvent> events =
-                    fireBeforePropertyChangeEvents(keys(properties), properties, new Properties());
+            List<PropertyChangeEvent> events = fireBeforePropertyChangeEvents(keys(properties), properties,
+                    new Properties());
             applyPropertyChangeEvents(events);
             firePropertyChangeEvents(events);
         } catch (RollbackBatchException e) {
@@ -500,16 +497,15 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         return loading;
     }
 
-    private List<PropertyChangeEvent> fireBeforePropertyChangeEvents(
-            Set keys, Properties oldValues, Properties newValues) throws RollbackBatchException {
+    private List<PropertyChangeEvent> fireBeforePropertyChangeEvents(Set keys, Properties oldValues,
+            Properties newValues) throws RollbackBatchException {
         List<PropertyChangeEvent> events = new ArrayList<PropertyChangeEvent>();
         for (Object keyObject : keys) {
             String key = (String) keyObject;
             String oldValue = oldValues.getProperty(key);
             String newValue = newValues.getProperty(key);
             if (!eq(oldValue, newValue)) {
-                PropertyChangeEvent event =
-                        new PropertyChangeEvent(proxy, key, oldValue, newValue);
+                PropertyChangeEvent event = new PropertyChangeEvent(proxy, key, oldValue, newValue);
                 try {
                     fireBeforePropertyChange(event);
                     events.add(event);
@@ -541,17 +537,18 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     @Delegate
     @Override
     public boolean equals(Object obj) {
-        if (! (obj instanceof Proxy)) return false;
-        InvocationHandler handler = Proxy.getInvocationHandler(obj);
-        if (! (handler instanceof PropertiesInvocationHandler))
+        if (!(obj instanceof Proxy))
             return false;
-        PropertiesInvocationHandler propsInvocationHandler = (PropertiesInvocationHandler)handler;
+        InvocationHandler handler = Proxy.getInvocationHandler(obj);
+        if (!(handler instanceof PropertiesInvocationHandler))
+            return false;
+        PropertiesInvocationHandler propsInvocationHandler = (PropertiesInvocationHandler) handler;
         PropertiesManager that = propsInvocationHandler.propertiesManager;
         return this.equals(that);
     }
 
     private boolean equals(PropertiesManager that) {
-        if (! this.isAssignationCompatibleWith(that))
+        if (!this.isAssignationCompatibleWith(that))
             return false;
         this.readLock.lock();
         try {

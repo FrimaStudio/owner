@@ -11,6 +11,7 @@ package org.aeonbits.owner.loaders;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,8 +28,13 @@ public class PropertiesLoader implements Loader {
         return true;
     }
 
-    public void load(Properties result, InputStream input) throws IOException {
-        result.load(input);
+    public void load(Map<String, Object> result, InputStream input) throws IOException {
+        Properties props = new Properties();
+        props.load(input);
+
+        for (String key : props.stringPropertyNames()) {
+            result.put(key, props.get(key));
+        }
     }
 
     public String defaultSpecFor(String urlPrefix) {

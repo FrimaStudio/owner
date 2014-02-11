@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -23,7 +24,7 @@ import java.util.Properties;
 public interface Loader extends Serializable {
 
     /**
-     * Indicates wether this Loader does accept the URL, guessing the content type from it.
+     * Indicates whether this Loader does accept the URL, guessing the content type from it.
      *
      * @since 1.0.5
      * @param url   the URL
@@ -38,12 +39,12 @@ public interface Loader extends Serializable {
      * @param result    the resulting properties where to load the {@link InputStream input}
      * @param input     the {@link InputStream} from where to load the properties.
      */
-    void load(Properties result, InputStream input) throws IOException;
+    void load(Map<String, Object> result, InputStream input) throws IOException;
 
     /**
      * Returns the default URL specification for a given url resource, that can be handled by this loader.
      *
-     * @param urlPrefix the prefix identifying the url resource.
+     * @param urlPrefix	the prefix identifying the url resource.
      * @return the default URL specification for a given url resource, that can be handled by this loader.
      */
     String defaultSpecFor(String urlPrefix);

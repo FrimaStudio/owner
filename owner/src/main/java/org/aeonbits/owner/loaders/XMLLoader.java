@@ -8,21 +8,23 @@
 
 package org.aeonbits.owner.loaders;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URL;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Stack;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ext.DefaultHandler2;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.Properties;
-import java.util.Stack;
 
 /**
  * A {@link Loader loader} able to read properties from standard XML Java properties files, as well as user defined
@@ -51,17 +53,12 @@ public class XMLLoader implements Loader {
 
     static class XmlToPropsHandler extends DefaultHandler2 {
 
-        private static final String PROPS_DTD_URI =
-                "http://java.sun.com/dtd/properties.dtd";
+        private static final String PROPS_DTD_URI = "http://java.sun.com/dtd/properties.dtd";
 
-        private static final String PROPS_DTD =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                        "<!-- DTD for properties -->" +
-                        "<!ELEMENT properties ( comment?, entry* ) >" +
-                        "<!ATTLIST properties version CDATA #FIXED \"1.0\">" +
-                        "<!ELEMENT comment (#PCDATA) >" +
-                        "<!ELEMENT entry (#PCDATA) >" +
-                        "<!ATTLIST entry key CDATA #REQUIRED>";
+        private static final String PROPS_DTD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<!-- DTD for properties -->" + "<!ELEMENT properties ( comment?, entry* ) >"
+                + "<!ATTLIST properties version CDATA #FIXED \"1.0\">" + "<!ELEMENT comment (#PCDATA) >"
+                + "<!ELEMENT entry (#PCDATA) >" + "<!ATTLIST entry key CDATA #REQUIRED>";
 
         private boolean isJavaPropertiesFormat = false;
         private final Properties props;
@@ -69,8 +66,8 @@ public class XMLLoader implements Loader {
         private final Stack<StringBuilder> value = new Stack<StringBuilder>();
 
         @Override
-        public InputSource resolveEntity(String name, String publicId, String baseURI,
-                                         String systemId) throws SAXException, IOException {
+        public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
+                throws SAXException, IOException {
             InputSource inputSource = null;
             if (systemId.equals(PROPS_DTD_URI)) {
                 isJavaPropertiesFormat = true;
@@ -85,8 +82,7 @@ public class XMLLoader implements Loader {
         }
 
         @Override
-        public void startElement(String uri, String localName, String qName,
-                                 Attributes attributes) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             value.push(new StringBuilder());
 
             if (isJavaPropertiesFormat) {
@@ -114,8 +110,7 @@ public class XMLLoader implements Loader {
         public void endElement(String uri, String localName, String qName) throws SAXException {
             String key = paths.peek();
             String propertyValue = this.value.peek().toString().trim();
-            if (!propertyValue.isEmpty() &&
-                    !(isJavaPropertiesFormat && "comment".equals(key)))
+            if (!propertyValue.isEmpty() && !(isJavaPropertiesFormat && "comment".equals(key)))
                 props.setProperty(key, propertyValue);
             value.pop();
             paths.pop();
@@ -132,12 +127,17 @@ public class XMLLoader implements Loader {
         return url.getFile().toLowerCase().endsWith(".xml");
     }
 
-    public void load(Properties result, InputStream input) throws IOException {
+    public void load(Map<String, Object> result, InputStream input) throws IOException {
         try {
             SAXParser parser = factory().newSAXParser();
-            XmlToPropsHandler h = new XmlToPropsHandler(result);
+            Properties props = new Properties();
+            XmlToPropsHandler h = new XmlToPropsHandler(props);
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", h);
             parser.parse(input, h);
+
+            for (String key : props.stringPropertyNames()) {
+                result.put(key, props.get(key));
+            }
         } catch (ParserConfigurationException e) {
             throw new IllegalArgumentException(e);
         } catch (SAXException e) {

@@ -62,6 +62,7 @@ public final class ConfigFactory {
      * @param <T>     type of the interface.
      * @return an object implementing the given interface, which maps methods to property values.
      */
+    @SafeVarargs
     public static <T extends Config> T create(Class<? extends T> clazz, Map<String, Object>... imports) {
         return INSTANCE.create(clazz, imports);
     }

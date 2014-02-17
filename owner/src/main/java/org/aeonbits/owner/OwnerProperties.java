@@ -35,6 +35,9 @@ public class OwnerProperties extends HashMap<String, Object> {
     }
 
     public Object get(String key) {
+        if (containsKey(key))
+            return super.get(key);
+
         return resolve(key, this);
     }
 

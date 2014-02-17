@@ -73,18 +73,47 @@ enum Converters {
         }
     },
 
+    METHOD_WITH_CONVERTER_CLASS_ANNOTATION {
+        @Override
+        Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
+            ConverterClass annotation = targetMethod.getAnnotation(ConverterClass.class);
+            if (annotation == null)
+                return null;
+
+            Class<? extends Converter> converterClass = annotation.value();
+            Converter<?> converter;
+            try {
+                converter = converterClass.newInstance();
+            } catch (InstantiationException e) {
+                throw unsupported(e, "Converter class %s can't be instantiated: %s", converterClass.getCanonicalName(),
+                        e.getMessage());
+            } catch (IllegalAccessException e) {
+                throw unsupported(e, "Converter class %s can't be accessed: %s", converterClass.getCanonicalName(),
+                        e.getMessage());
+            }
+            Object result = converter.convert(targetMethod, value);
+            if (result == null)
+                return NULL;
+            return result;
+        }
+    },
+
     COLLECTION {
         @Override
         Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
             if (!Collection.class.isAssignableFrom(targetType))
                 return null;
 
-            if (!(value instanceof String)) {
-                throw unsupported("Cannot convert '%s' to '%s.'", value, targetType);
+            Collection<Object> collection;
+
+            if (value.getClass().isArray() || List.class.isAssignableFrom(value.getClass())) {
+                collection = Arrays.asList(value);
+            } else if (value instanceof String) {
+                collection = Arrays.asList(convertToArray(targetMethod, (String) value));
+            } else {
+                return null;
             }
 
-            Object[] array = convertToArray(targetMethod, (String) value);
-            Collection<Object> collection = Arrays.asList(array);
             Collection<Object> result = instantiateCollection(targetType);
             result.addAll(collection);
             return result;
@@ -128,32 +157,6 @@ enum Converters {
             else if (Set.class.isAssignableFrom(targetType))
                 return new LinkedHashSet<T>();
             return new ArrayList<T>();
-        }
-
-    },
-
-    METHOD_WITH_CONVERTER_CLASS_ANNOTATION {
-        @Override
-        Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
-            ConverterClass annotation = targetMethod.getAnnotation(ConverterClass.class);
-            if (annotation == null)
-                return null;
-
-            Class<? extends Converter> converterClass = annotation.value();
-            Converter<?> converter;
-            try {
-                converter = converterClass.newInstance();
-            } catch (InstantiationException e) {
-                throw unsupported(e, "Converter class %s can't be instantiated: %s", converterClass.getCanonicalName(),
-                        e.getMessage());
-            } catch (IllegalAccessException e) {
-                throw unsupported(e, "Converter class %s can't be accessed: %s", converterClass.getCanonicalName(),
-                        e.getMessage());
-            }
-            Object result = converter.convert(targetMethod, value);
-            if (result == null)
-                return NULL;
-            return result;
         }
     },
 

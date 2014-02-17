@@ -12,8 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.Map;
 import java.util.Properties;
+
+import org.aeonbits.owner.OwnerProperties;
 
 /**
  * Defines the interface of a generic Properties loader.
@@ -39,7 +40,7 @@ public interface Loader extends Serializable {
      * @param result    the resulting properties where to load the {@link InputStream input}
      * @param input     the {@link InputStream} from where to load the properties.
      */
-    void load(Map<String, Object> result, InputStream input) throws IOException;
+    void load(OwnerProperties result, InputStream input) throws IOException;
 
     /**
      * Returns the default URL specification for a given url resource, that can be handled by this loader.

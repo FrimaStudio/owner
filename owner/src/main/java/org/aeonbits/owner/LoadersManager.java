@@ -17,12 +17,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.aeonbits.owner.loaders.Loader;
 import org.aeonbits.owner.loaders.PropertiesLoader;
-import org.aeonbits.owner.loaders.XMLLoader;
+import org.aeonbits.owner.loaders.YAMLLoader;
 
 /**
  * This class is responsible of locating an appropriate Loader for a given URL (based the extension in the resource
@@ -38,10 +37,10 @@ class LoadersManager implements Serializable {
 
     LoadersManager() {
         registerLoader(new PropertiesLoader());
-        registerLoader(new XMLLoader());
+        registerLoader(new YAMLLoader());
     }
 
-    void load(Map<String, Object> result, URL url) throws IOException {
+    void load(OwnerProperties result, URL url) throws IOException {
         InputStream stream = url.openStream();
         try {
             Loader loader = findLoader(url);

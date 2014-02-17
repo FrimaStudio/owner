@@ -8,10 +8,9 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.loaders.Loader;
-
 import java.util.Map;
-import java.util.Properties;
+
+import org.aeonbits.owner.loaders.Loader;
 
 /**
  * Interface for factory implementation used to instantiate {@link Config} instances.
@@ -30,7 +29,7 @@ public interface Factory {
      * @return an object implementing the given interface, which maps methods to property values.
      * @since 1.0.5
      */
-    <T extends Config> T create(Class<? extends T> clazz, Map<?, ?>... imports);
+    <T extends Config> T create(Class<? extends T> clazz, Map<String, Object>... imports);
 
     /**
      * Returns the value for a given property.
@@ -39,7 +38,7 @@ public interface Factory {
      * @return the value for the property, or <tt>null</tt> if the property is not set.
      * @since 1.0.5
      */
-    String getProperty(String key);
+    Object getProperty(String key);
 
     /**
      * Set a property in the ConfigFactory. Those properties will be used to expand variables specified in the `@Source`
@@ -50,7 +49,7 @@ public interface Factory {
      * @return the old value.
      * @since 1.0.5
      */
-    String setProperty(String key, String value);
+    Object setProperty(String key, Object value);
 
     /**
      * Clears the value for the property having the given key. This means, that the given property is removed.
@@ -59,7 +58,7 @@ public interface Factory {
      * @return the old value for the given key, or <tt>null</tt> if the property was not set.
      * @since 1.0.5
      */
-    String clearProperty(String key);
+    Object clearProperty(String key);
 
     /**
      * Those properties will be used to expand variables specified in the `@Source` annotation, or by the ConfigFactory
@@ -68,7 +67,7 @@ public interface Factory {
      * @return the properties in the ConfigFactory
      * @since 1.0.5
      */
-    Properties getProperties();
+    OwnerProperties getProperties();
 
     /**
      * Those properties will be used to expand variables specified in the `@Source` annotation, or by the ConfigFactory
@@ -77,7 +76,7 @@ public interface Factory {
      * @param properties the properties to set in the config Factory.
      * @since 1.0.5
      */
-    void setProperties(Properties properties);
+    void setProperties(OwnerProperties properties);
 
     /**
      * Registers a loader to enables additional file formats.

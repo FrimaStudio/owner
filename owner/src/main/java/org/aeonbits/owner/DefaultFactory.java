@@ -8,13 +8,12 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.loaders.Loader;
+import static java.lang.reflect.Proxy.newProxyInstance;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static java.lang.reflect.Proxy.newProxyInstance;
+import org.aeonbits.owner.loaders.Loader;
 
 /**
  * Default implementation for {@link Factory}.
@@ -24,30 +23,30 @@ import static java.lang.reflect.Proxy.newProxyInstance;
 class DefaultFactory implements Factory {
 
     private final ScheduledExecutorService scheduler;
-    private Properties props;
+    private OwnerProperties props;
     final LoadersManager loadersManager;
 
-    DefaultFactory(ScheduledExecutorService scheduler, Properties props) {
+    DefaultFactory(ScheduledExecutorService scheduler, OwnerProperties props) {
         this.scheduler = scheduler;
         this.props = props;
         this.loadersManager = new LoadersManager();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Config> T create(Class<? extends T> clazz, Map<?, ?>... imports) {
-        Class<?>[] interfaces = new Class<?>[] {clazz};
+    public <T extends Config> T create(Class<? extends T> clazz, Map<String, Object>... imports) {
+        Class<?>[] interfaces = new Class<?>[] { clazz };
         VariablesExpander expander = new VariablesExpander(props);
-        PropertiesManager manager = new PropertiesManager(clazz, new Properties(), scheduler, expander, loadersManager,
-                imports);
+        PropertiesManager manager = new PropertiesManager(clazz, new OwnerProperties(), scheduler, expander,
+                loadersManager, imports);
         PropertiesInvocationHandler handler = new PropertiesInvocationHandler(manager);
         T proxy = (T) newProxyInstance(clazz.getClassLoader(), interfaces, handler);
         handler.setProxy(proxy);
         return proxy;
     }
 
-    public String setProperty(String key, String value) {
+    public Object setProperty(String key, Object value) {
         checkKey(key);
-        return (String) props.setProperty(key, value);
+        return props.put(key, value);
     }
 
     private void checkKey(String key) {
@@ -57,13 +56,13 @@ class DefaultFactory implements Factory {
             throw new IllegalArgumentException("key can't be empty");
     }
 
-    public Properties getProperties() {
+    public OwnerProperties getProperties() {
         return props;
     }
 
-    public void setProperties(Properties properties) {
+    public void setProperties(OwnerProperties properties) {
         if (properties == null)
-            props = new Properties();
+            props = new OwnerProperties();
         else
             props = properties;
     }
@@ -72,14 +71,14 @@ class DefaultFactory implements Factory {
         loadersManager.registerLoader(loader);
     }
 
-    public String getProperty(String key) {
+    public Object getProperty(String key) {
         checkKey(key);
-        return props.getProperty(key);
+        return props.get(key);
     }
 
-    public String clearProperty(String key) {
+    public Object clearProperty(String key) {
         checkKey(key);
-        return (String) props.remove(key);
+        return props.remove(key);
     }
 
 }

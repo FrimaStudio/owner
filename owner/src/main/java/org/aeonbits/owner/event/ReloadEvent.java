@@ -8,11 +8,11 @@
 
 package org.aeonbits.owner.event;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.beans.PropertyChangeEvent;
 import java.util.List;
-import java.util.Properties;
-
-import static java.util.Collections.unmodifiableList;
+import java.util.Map;
 
 /**
  * A semantic event which indicates that a reload occurred.
@@ -24,8 +24,8 @@ import static java.util.Collections.unmodifiableList;
 public class ReloadEvent extends Event {
 
     private final List<PropertyChangeEvent> events;
-    private final Properties oldProperties;
-    private final Properties newProperties;
+    private final Map<String, Object> oldProperties;
+    private final Map<String, Object> newProperties;
 
     /**
      * Constructs a prototypical Event.
@@ -37,12 +37,14 @@ public class ReloadEvent extends Event {
      * @param newProperties the properties after the reload.
      * @throws IllegalArgumentException if source is null.
      */
-    public ReloadEvent(Object source, List<PropertyChangeEvent> events, Properties oldProperties,
-                       Properties newProperties) {
+    public ReloadEvent(Object source, List<PropertyChangeEvent> events, Map<String, Object> oldProperties,
+            Map<String, Object> newProperties) {
         super(source);
         this.events = unmodifiableList(events);
-        this.oldProperties = new UnmodifiableProperties(oldProperties);
-        this.newProperties = new UnmodifiableProperties(newProperties);
+
+        //TODO: Make read only
+        this.oldProperties = oldProperties;
+        this.newProperties = newProperties;
     }
 
     /**
@@ -61,7 +63,7 @@ public class ReloadEvent extends Event {
      *
      * @return the properties before the reload.
      */
-    public Properties getOldProperties() {
+    public Map<String, Object> getOldProperties() {
         return oldProperties;
     }
 
@@ -70,7 +72,7 @@ public class ReloadEvent extends Event {
      *
      * @return the properties after the reload.
      */
-    public Properties getNewProperties() {
+    public Map<String, Object> getNewProperties() {
         return newProperties;
     }
 

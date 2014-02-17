@@ -11,8 +11,9 @@ package org.aeonbits.owner.loaders;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Map;
 import java.util.Properties;
+
+import org.aeonbits.owner.OwnerProperties;
 
 /**
  * A {@link Loader loader} able to read properties from standard Java properties files.
@@ -28,7 +29,7 @@ public class PropertiesLoader implements Loader {
         return true;
     }
 
-    public void load(Map<String, Object> result, InputStream input) throws IOException {
+    public void load(OwnerProperties result, InputStream input) throws IOException {
         Properties props = new Properties();
         props.load(input);
 

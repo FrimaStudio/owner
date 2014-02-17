@@ -8,14 +8,13 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.loaders.Loader;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import org.aeonbits.owner.loaders.Loader;
 
 /**
  * A static factory class to instantiate {@link Config} instances.
@@ -35,7 +34,8 @@ public final class ConfigFactory {
     private static final Factory INSTANCE = newInstance();
 
     /** Don't let anyone instantiate this class */
-    private ConfigFactory() {}
+    private ConfigFactory() {
+    }
 
     /**
      * Returns a new instance of a config Factory object.
@@ -50,7 +50,7 @@ public final class ConfigFactory {
                 return result;
             }
         });
-        Properties props = new Properties();
+        OwnerProperties props = new OwnerProperties();
         return new DefaultFactory(scheduler, props);
     }
 
@@ -62,7 +62,7 @@ public final class ConfigFactory {
      * @param <T>     type of the interface.
      * @return an object implementing the given interface, which maps methods to property values.
      */
-    public static <T extends Config> T create(Class<? extends T> clazz, Map<?, ?>... imports) {
+    public static <T extends Config> T create(Class<? extends T> clazz, Map<String, Object>... imports) {
         return INSTANCE.create(clazz, imports);
     }
 
@@ -75,7 +75,7 @@ public final class ConfigFactory {
      * @return the old value.
      * @since 1.0.4
      */
-    public static String setProperty(String key, String value) {
+    public static Object setProperty(String key, Object value) {
         return INSTANCE.setProperty(key, value);
     }
 
@@ -86,7 +86,7 @@ public final class ConfigFactory {
      * @return the properties in the ConfigFactory
      * @since 1.0.4
      */
-    public static Properties getProperties() {
+    public static OwnerProperties getProperties() {
         return INSTANCE.getProperties();
     }
 
@@ -97,7 +97,7 @@ public final class ConfigFactory {
      * @param properties the properties to set in the config Factory.
      * @since 1.0.4
      */
-    public static void setProperties(Properties properties) {
+    public static void setProperties(OwnerProperties properties) {
         INSTANCE.setProperties(properties);
     }
 
@@ -108,7 +108,7 @@ public final class ConfigFactory {
      * @return the value for the property, or <tt>null</tt> if the property is not set.
      * @since 1.0.4
      */
-    public static String getProperty(String key) {
+    public static Object getProperty(String key) {
         return INSTANCE.getProperty(key);
     }
 
@@ -119,7 +119,7 @@ public final class ConfigFactory {
      * @return the old value for the given key, or <tt>null</tt> if the property was not set.
      * @since 1.0.4
      */
-    public static String clearProperty(String key) {
+    public static Object clearProperty(String key) {
         return INSTANCE.clearProperty(key);
     }
 

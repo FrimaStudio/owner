@@ -141,6 +141,14 @@
         </profile>
     </profiles>
 
+    <repositories>
+        <repository>
+            <id>Sonatype-public</id>
+            <name>SnakeYAML repository</name>
+            <url>http://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -167,6 +175,12 @@
                 <version>1.6</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.13</version>
+                <scope>compile</scope>
+          </dependency>
         </dependencies>
     </dependencyManagement>
 

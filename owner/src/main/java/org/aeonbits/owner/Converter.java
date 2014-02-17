@@ -26,10 +26,10 @@ public interface Converter<T> {
      * The converter is instantiated for every call, so it shouldn't have any internal state.
      *
      * @param method the method invoked on the <tt>{@link Config} object</tt>
-     * @param input  the property value specified as input text to be converted to the T return type
+     * @param value  the property value to be converted to the T return type
      * @return the object of type T converted from the input string.
      * @since 1.0.4
      */
-    T convert(Method method, String input);
+    T convert(Method method, Object value);
 
 }

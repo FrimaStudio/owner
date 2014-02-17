@@ -8,6 +8,12 @@
 
 package org.aeonbits.owner;
 
+import static org.aeonbits.owner.Config.DisableableFeature.PARAMETER_FORMATTING;
+import static org.aeonbits.owner.Config.DisableableFeature.VARIABLE_EXPANSION;
+import static org.aeonbits.owner.Converters.convert;
+import static org.aeonbits.owner.PropertiesMapper.key;
+import static org.aeonbits.owner.Util.isFeatureDisabled;
+
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -16,12 +22,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.aeonbits.owner.Config.DisableableFeature.PARAMETER_FORMATTING;
-import static org.aeonbits.owner.Config.DisableableFeature.VARIABLE_EXPANSION;
-import static org.aeonbits.owner.Converters.convert;
-import static org.aeonbits.owner.PropertiesManager.Delegate;
-import static org.aeonbits.owner.PropertiesMapper.key;
-import static org.aeonbits.owner.Util.isFeatureDisabled;
+import org.aeonbits.owner.PropertiesManager.Delegate;
 
 /**
  * This {@link InvocationHandler} receives method calls from the delegate instantiated by {@link ConfigFactory} and maps
@@ -70,18 +71,18 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
     }
 
     private boolean equals(Method a, Method b) {
-        return a.getName().equals(b.getName())
-                && a.getReturnType().equals(b.getReturnType())
+        return a.getName().equals(b.getName()) && a.getReturnType().equals(b.getReturnType())
                 && Arrays.equals(a.getParameterTypes(), b.getParameterTypes());
     }
 
     private Object resolveProperty(Method method, Object... args) {
         String key = expandKey(method);
-        String value = propertiesManager.getProperty(key);
+        Object value = propertiesManager.getProperty(key);
         if (value == null)
             return null;
         Object result = convert(method, method.getReturnType(), format(method, expandVariables(method, value), args));
-        if (result == Converters.NULL) return null;
+        if (result == Converters.NULL)
+            return null;
         return result;
     }
 
@@ -92,16 +93,26 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
         return substitutor.replace(key);
     }
 
-    private String format(Method method, String format, Object... args) {
+    private Object format(Method method, Object format, Object... args) {
         if (isFeatureDisabled(method, PARAMETER_FORMATTING))
             return format;
-        return String.format(format, args);
+
+        if (format instanceof String) {
+            return String.format((String) format, args);
+        }
+
+        return format;
     }
 
-    private String expandVariables(Method method, String value) {
+    private Object expandVariables(Method method, Object value) {
         if (isFeatureDisabled(method, VARIABLE_EXPANSION))
             return value;
-        return substitutor.replace(value);
+
+        if (value instanceof String) {
+            return substitutor.replace((String) value);
+        }
+
+        return value;
     }
 
     private static Method[] findDelegates() {

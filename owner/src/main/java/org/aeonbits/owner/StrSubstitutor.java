@@ -8,13 +8,10 @@
 
 package org.aeonbits.owner;
 
-import java.io.Serializable;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static java.util.regex.Pattern.compile;
-import static org.aeonbits.owner.Util.fixBackslashForRegex;
+
+import java.io.Serializable;
+import java.util.regex.Pattern;
 
 /**
  * Substitutes variables within a string by values.
@@ -44,7 +41,7 @@ import static org.aeonbits.owner.Util.fixBackslashForRegex;
  */
 class StrSubstitutor implements Serializable {
 
-    private final Properties values;
+    private final OwnerProperties values;
     private static final Pattern PATTERN = compile("\\$\\{(.+?)\\}");
 
     /**
@@ -53,7 +50,7 @@ class StrSubstitutor implements Serializable {
      *
      * @param values the variables' values, may be null
      */
-    StrSubstitutor(Properties values) {
+    StrSubstitutor(OwnerProperties values) {
         this.values = values;
     }
 
@@ -67,6 +64,8 @@ class StrSubstitutor implements Serializable {
     String replace(String source) {
         if (source == null)
             return null;
+        //TODO: Fix this
+        /*
         Matcher m = PATTERN.matcher(source);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
@@ -76,7 +75,8 @@ class StrSubstitutor implements Serializable {
             m.appendReplacement(sb, fixBackslashForRegex(replacement));
         }
         m.appendTail(sb);
-        return sb.toString();
+        return sb.toString();*/
+        return source;
     }
 
 }

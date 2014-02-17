@@ -8,8 +8,9 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.Config.DisableFeature;
-import org.aeonbits.owner.Config.DisableableFeature;
+import static java.lang.String.format;
+import static java.net.URLDecoder.decode;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -18,13 +19,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static java.lang.String.format;
-import static java.net.URLDecoder.decode;
-import static java.util.Arrays.asList;
+import org.aeonbits.owner.Config.DisableFeature;
+import org.aeonbits.owner.Config.DisableableFeature;
 
 /**
  * This class contains utility methods used all over the library.
@@ -66,7 +67,8 @@ abstract class Util {
     };
 
     /** Don't let anyone instantiate this class */
-    private Util() {}
+    private Util() {
+    }
 
     static <T> List<T> reverse(List<T> src) {
         List<T> copy = new ArrayList<T>(src);
@@ -103,8 +105,8 @@ abstract class Util {
 
     static boolean isFeatureDisabled(Method method, DisableableFeature feature) {
         Class<DisableFeature> annotation = DisableFeature.class;
-        return isFeatureDisabled(feature, method.getDeclaringClass().getAnnotation(annotation)) ||
-                isFeatureDisabled(feature, method.getAnnotation(annotation));
+        return isFeatureDisabled(feature, method.getDeclaringClass().getAnnotation(annotation))
+                || isFeatureDisabled(feature, method.getAnnotation(annotation));
     }
 
     private static boolean isFeatureDisabled(DisableableFeature feature, DisableFeature annotation) {
@@ -124,7 +126,8 @@ abstract class Util {
     }
 
     static String asString(Object result) {
-        if (result == null) return null;
+        if (result == null)
+            return null;
         return String.valueOf(result);
     }
 
@@ -162,6 +165,16 @@ abstract class Util {
 
     static SystemProvider system() {
         return system;
+    }
+
+    static Map<String, Object> propertiesToMap(Properties props) {
+        Map<String, Object> container = new HashMap<String, Object>();
+
+        for (String key : props.stringPropertyNames()) {
+            container.put(key, props.get(key));
+        }
+
+        return container;
     }
 
 }

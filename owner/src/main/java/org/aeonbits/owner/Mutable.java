@@ -47,7 +47,7 @@ public interface Mutable extends Config {
      * @return the previous value of the specified key, or <code>null</code> if it did not have one.
      * @since 1.0.4
      */
-    String setProperty(String key, String value);
+    Object setProperty(String key, Object value);
 
     /**
      * Removes a given property.
@@ -57,7 +57,7 @@ public interface Mutable extends Config {
      * @see java.util.Hashtable#remove(Object)
      * @since 1.0.4
      */
-    String removeProperty(String key);
+    Object removeProperty(String key);
 
     /**
      * Clears all properties.

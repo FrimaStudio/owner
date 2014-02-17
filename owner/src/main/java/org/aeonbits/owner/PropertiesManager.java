@@ -21,12 +21,6 @@ import static org.aeonbits.owner.Util.unsupported;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -35,14 +29,13 @@ import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -62,11 +55,11 @@ import org.aeonbits.owner.event.TransactionalReloadListener;
  *
  * @author Luigi R. Viggiano
  */
-class PropertiesManager implements Reloadable, Accessible, Mutable {
+class PropertiesManager implements Reloadable, Accessible {
 
     private final Class<? extends Config> clazz;
-    private final Map<?, ?>[] imports;
-    private final Properties properties;
+    private final Map<String, Object>[] imports;
+    private final OwnerProperties properties;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReadLock readLock = lock.readLock();
     private final WriteLock writeLock = lock.writeLock();
@@ -102,8 +95,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     @interface Delegate {
     }
 
-    PropertiesManager(Class<? extends Config> clazz, Properties properties, ScheduledExecutorService scheduler,
-            VariablesExpander expander, LoadersManager loaders, Map<?, ?>... imports) {
+    PropertiesManager(Class<? extends Config> clazz, OwnerProperties properties, ScheduledExecutorService scheduler,
+            VariablesExpander expander, LoadersManager loaders, Map<String, Object>... imports) {
         this.clazz = clazz;
         this.properties = properties;
         this.loaders = loaders;
@@ -156,7 +149,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         return loaders.defaultSpecs(prefix);
     }
 
-    Properties load() {
+    OwnerProperties load() {
         writeLock.lock();
         try {
             return load(properties);
@@ -165,11 +158,11 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         }
     }
 
-    private Properties load(Properties props) {
+    private OwnerProperties load(OwnerProperties props) {
         try {
             loading = true;
             defaults(props, clazz);
-            Map<String, Object> loadedFromFile = doLoad();
+            OwnerProperties loadedFromFile = doLoad();
             merge(props, loadedFromFile);
             merge(props, reverse(imports));
             return props;
@@ -182,7 +175,7 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     public void reload() {
         writeLock.lock();
         try {
-            Properties loaded = load(new Properties());
+            OwnerProperties loaded = load(new OwnerProperties());
             List<PropertyChangeEvent> events = fireBeforePropertyChangeEvents(keys(properties, loaded), properties,
                     loaded);
             ReloadEvent reloadEvent = fireBeforeReloadEvent(events, properties, loaded);
@@ -213,8 +206,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
             listener.reloadPerformed(reloadEvent);
     }
 
-    private ReloadEvent fireBeforeReloadEvent(List<PropertyChangeEvent> events, Properties oldProperties,
-            Properties newProperties) throws RollbackBatchException {
+    private ReloadEvent fireBeforeReloadEvent(List<PropertyChangeEvent> events, Map<String, Object> oldProperties,
+            Map<String, Object> newProperties) throws RollbackBatchException {
         ReloadEvent reloadEvent = new ReloadEvent(proxy, events, oldProperties, newProperties);
         for (ReloadListener listener : reloadListeners)
             if (listener instanceof TransactionalReloadListener)
@@ -294,20 +287,20 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         }
     }
 
-    Map<String, Object> doLoad() {
+    OwnerProperties doLoad() {
         return loadType.load(urls, loaders);
     }
 
-    private static void merge(Properties results, Map<?, ?>... inputs) {
-        for (Map<?, ?> input : inputs)
+    private static void merge(OwnerProperties results, Map<String, Object>... inputs) {
+        for (Map<String, Object> input : inputs)
             results.putAll(input);
     }
 
     @Delegate
-    public String getProperty(String key) {
+    public Object getProperty(String key) {
         readLock.lock();
         try {
-            return properties.getProperty(key);
+            return properties.get(key);
         } finally {
             readLock.unlock();
         }
@@ -319,20 +312,14 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     }
 
     @Delegate
-    public String getProperty(String key, String defaultValue) {
+    public Object getProperty(String key, Object defaultValue) {
         readLock.lock();
         try {
-            return properties.getProperty(key, defaultValue);
-        } finally {
-            readLock.unlock();
-        }
-    }
+            if (!properties.containsKey(key)) {
+                return properties.get(key);
+            }
 
-    @Delegate
-    public void storeToXML(OutputStream os, String comment) throws IOException {
-        readLock.lock();
-        try {
-            properties.storeToXML(os, comment);
+            return defaultValue;
         } finally {
             readLock.unlock();
         }
@@ -342,9 +329,8 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     public Set<String> propertyNames() {
         readLock.lock();
         try {
-            LinkedHashSet<String> result = new LinkedHashSet<String>();
-            for (Enumeration<?> propertyNames = properties.propertyNames(); propertyNames.hasMoreElements();)
-                result.add((String) propertyNames.nextElement());
+            //TODO: Make recursive
+            LinkedHashSet<String> result = new LinkedHashSet<String>(properties.keySet());
             return result;
         } finally {
             readLock.unlock();
@@ -352,47 +338,17 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
     }
 
     @Delegate
-    public void list(PrintStream out) {
-        readLock.lock();
-        try {
-            properties.list(out);
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    @Delegate
-    public void list(PrintWriter out) {
-        readLock.lock();
-        try {
-            properties.list(out);
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    @Delegate
-    public void store(OutputStream out, String comments) throws IOException {
-        readLock.lock();
-        try {
-            properties.store(out, comments);
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    @Delegate
-    public String setProperty(String key, String newValue) {
+    public Object setProperty(String key, Object newValue) {
         writeLock.lock();
         try {
-            String oldValue = properties.getProperty(key);
+            Object oldValue = properties.get(key);
             try {
                 if (eq(oldValue, newValue))
                     return oldValue;
 
                 PropertyChangeEvent event = new PropertyChangeEvent(proxy, key, oldValue, newValue);
                 fireBeforePropertyChange(event);
-                String result = performSetProperty(key, newValue);
+                Object result = performSetProperty(key, newValue);
                 firePropertyChange(event);
                 return result;
             } catch (RollbackException e) {
@@ -403,23 +359,23 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         }
     }
 
-    private String performSetProperty(String key, Object value) {
-        return (value == null) ? performRemoveProperty(key) : asString(properties.setProperty(key, asString(value)));
+    private Object performSetProperty(String key, Object value) {
+        return (value == null) ? performRemoveProperty(key) : asString(properties.put(key, value));
     }
 
     @Delegate
-    public String removeProperty(String key) {
+    public Object removeProperty(String key) {
         writeLock.lock();
         try {
-            String oldValue = properties.getProperty(key);
-            String newValue = null;
+            Object oldValue = properties.get(key);
+            Object newValue = null;
             PropertyChangeEvent event = new PropertyChangeEvent(proxy, key, oldValue, newValue);
             fireBeforePropertyChange(event);
             String result = performRemoveProperty(key);
             firePropertyChange(event);
             return result;
         } catch (RollbackException e) {
-            return properties.getProperty(key);
+            return properties.get(key);
         } finally {
             writeLock.unlock();
         }
@@ -434,44 +390,10 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         writeLock.lock();
         try {
             List<PropertyChangeEvent> events = fireBeforePropertyChangeEvents(keys(properties), properties,
-                    new Properties());
+                    new HashMap<String, Object>());
             applyPropertyChangeEvents(events);
             firePropertyChangeEvents(events);
         } catch (RollbackBatchException e) {
-            ignore();
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    @Delegate
-    public void load(InputStream inStream) throws IOException {
-        writeLock.lock();
-        try {
-            Properties loaded = new Properties();
-            loaded.load(inStream);
-            performLoad(keys(loaded), loaded);
-        } catch (RollbackBatchException ex) {
-            ignore();
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    private void performLoad(Set keys, Properties props) throws RollbackBatchException {
-        List<PropertyChangeEvent> events = fireBeforePropertyChangeEvents(keys, properties, props);
-        applyPropertyChangeEvents(events);
-        firePropertyChangeEvents(events);
-    }
-
-    @Delegate
-    public void load(Reader reader) throws IOException {
-        writeLock.lock();
-        try {
-            Properties loaded = new Properties();
-            loaded.load(reader);
-            performLoad(keys(loaded), loaded);
-        } catch (RollbackBatchException ex) {
             ignore();
         } finally {
             writeLock.unlock();
@@ -497,13 +419,13 @@ class PropertiesManager implements Reloadable, Accessible, Mutable {
         return loading;
     }
 
-    private List<PropertyChangeEvent> fireBeforePropertyChangeEvents(Set keys, Properties oldValues,
-            Properties newValues) throws RollbackBatchException {
+    private List<PropertyChangeEvent> fireBeforePropertyChangeEvents(Set keys, Map<String, Object> oldValues,
+            Map<String, Object> newValues) throws RollbackBatchException {
         List<PropertyChangeEvent> events = new ArrayList<PropertyChangeEvent>();
         for (Object keyObject : keys) {
             String key = (String) keyObject;
-            String oldValue = oldValues.getProperty(key);
-            String newValue = newValues.getProperty(key);
+            Object oldValue = oldValues.get(key);
+            Object newValue = newValues.get(key);
             if (!eq(oldValue, newValue)) {
                 PropertyChangeEvent event = new PropertyChangeEvent(proxy, key, oldValue, newValue);
                 try {

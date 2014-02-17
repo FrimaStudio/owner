@@ -23,9 +23,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -101,8 +99,8 @@ public interface Config extends Serializable {
          */
         FIRST {
             @Override
-            Map<String, Object> load(List<URL> urls, LoadersManager loaders) {
-                Map<String, Object> result = new HashMap<String, Object>();
+            OwnerProperties load(List<URL> urls, LoadersManager loaders) {
+                OwnerProperties result = new OwnerProperties();
                 for (URL url : urls)
                     try {
                         loaders.load(result, url);
@@ -121,8 +119,8 @@ public interface Config extends Serializable {
          */
         MERGE {
             @Override
-            Map<String, Object> load(List<URL> urls, LoadersManager loaders) {
-                Map<String, Object> result = new HashMap<String, Object>();
+            OwnerProperties load(List<URL> urls, LoadersManager loaders) {
+                OwnerProperties result = new OwnerProperties();
                 for (URL url : reverse(urls))
                     try {
                         loaders.load(result, url);
@@ -134,7 +132,7 @@ public interface Config extends Serializable {
             }
         };
 
-        abstract Map<String, Object> load(List<URL> urls, LoadersManager loaders);
+        abstract OwnerProperties load(List<URL> urls, LoadersManager loaders);
     }
 
     /**

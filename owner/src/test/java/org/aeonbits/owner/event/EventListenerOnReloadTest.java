@@ -8,25 +8,6 @@
 
 package org.aeonbits.owner.event;
 
-import org.aeonbits.owner.Config.Sources;
-import org.aeonbits.owner.ConfigFactory;
-import org.aeonbits.owner.Mutable;
-import org.aeonbits.owner.Reloadable;
-import org.aeonbits.owner.TestConstants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.beans.PropertyChangeEvent;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Properties;
-
 import static org.aeonbits.owner.UtilTest.fileFromURL;
 import static org.aeonbits.owner.UtilTest.ignore;
 import static org.aeonbits.owner.UtilTest.save;
@@ -47,6 +28,25 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+
+import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.aeonbits.owner.Config.Sources;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.Mutable;
+import org.aeonbits.owner.OwnerProperties;
+import org.aeonbits.owner.Reloadable;
+import org.aeonbits.owner.TestConstants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Luigi R. Viggiano
@@ -92,15 +92,17 @@ public class EventListenerOnReloadTest implements TestConstants {
     @Test
     public void testPropertyChangeListenerOnReloadWhenRollbackBatchException() throws Throwable {
 
-        save(target, new Properties() {{
-            setProperty("someInteger", "5");
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "5");
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
-        doNothing().doNothing().doThrow(new RollbackBatchException())
-                .when(propertyChangeListener).beforePropertyChange(any(PropertyChangeEvent.class));
+        doNothing().doNothing().doThrow(new RollbackBatchException()).when(propertyChangeListener)
+                .beforePropertyChange(any(PropertyChangeEvent.class));
 
         cfg.reload();
 
@@ -110,20 +112,21 @@ public class EventListenerOnReloadTest implements TestConstants {
         assertNull(cfg.nullsByDefault());
     }
 
-
     @Test
     public void testPropertyChangeListenerOnReloadWhenRollbackOperationException() throws Throwable {
 
-        save(target, new Properties() {{
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
         PropertyChangeEvent eventToRollback = new PropertyChangeEvent(cfg, "someString", "foobar", "bazbar");
 
-        doThrow(new RollbackOperationException())
-                .when(propertyChangeListener).beforePropertyChange(argThat(matches(eventToRollback)));
+        doThrow(new RollbackOperationException()).when(propertyChangeListener).beforePropertyChange(
+                argThat(matches(eventToRollback)));
 
         cfg.reload();
 
@@ -141,12 +144,14 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testPropertyChangeListenerOnReloadWhenChangeHappen() throws Throwable {
-        save(target, new Properties() {{
-            setProperty("someInteger", "5");
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "5");
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
         cfg.reload();
 
@@ -198,12 +203,14 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testReloadListenerIsInvokedOnReload() throws IOException, RollbackBatchException {
-        save(target, new Properties() {{
-            setProperty("someInteger", "5");
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "5");
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
         cfg.reload();
 
@@ -221,12 +228,14 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testReloadWhenRollbackBatchExceptionIsThrown() throws Throwable {
-        save(target, new Properties() {{
-            setProperty("someInteger", "5");
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "5");
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
         doThrow(RollbackBatchException.class).when(reloadListener).beforeReload(any(ReloadEvent.class));
 
@@ -240,12 +249,14 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testReloadEventIsNotModifiable() throws Throwable {
-        save(target, new Properties() {{
-            setProperty("someInteger", "5");
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "5");
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
         final ReloadEvent[] beforeEvent = new ReloadEvent[1];
         final ReloadEvent[] afterEvent = new ReloadEvent[1];
@@ -290,12 +301,12 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testFullReloadCycle() throws IOException {
-        final boolean[] reloadPerformed = new boolean[] {false};
+        final boolean[] reloadPerformed = new boolean[] { false };
         cfg.addReloadListener(new TransactionalReloadListener() {
 
             public void beforeReload(ReloadEvent event) throws RollbackBatchException {
                 String notAllowedValue = "42";
-                String newSomeInteger = event.getNewProperties().getProperty("someInteger");
+                String newSomeInteger = (String) event.getNewProperties().get("someInteger");
                 if (notAllowedValue.equals(newSomeInteger))
                     throw new RollbackBatchException("42 is not allowed for property 'someInteger'");
             }
@@ -306,12 +317,14 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         });
 
-        save(target, new Properties() {{
-            setProperty("someInteger", "41");
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "41");
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
         cfg.reload();
 
@@ -323,11 +336,13 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         reloadPerformed[0] = false;
 
-        save(target, new Properties() {{
-            setProperty("someInteger", "42");
-            setProperty("someString", "blahblah");
-            setProperty("someDouble", "1.234");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "42");
+                put("someString", "blahblah");
+                put("someDouble", "1.234");
+            }
+        });
 
         cfg.reload();
 
@@ -339,26 +354,24 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     }
 
-
     @Test
     public void testFullPropertyChangeCycleCycle() throws IOException {
-        final boolean[] reloadPerformed = new boolean[] {false};
+        final boolean[] reloadPerformed = new boolean[] { false };
 
-        cfg.addPropertyChangeListener("someInteger",
-                new TransactionalPropertyChangeListener() {
-            public void beforePropertyChange(PropertyChangeEvent event)
-                    throws RollbackOperationException, RollbackBatchException {
+        cfg.addPropertyChangeListener("someInteger", new TransactionalPropertyChangeListener() {
+            public void beforePropertyChange(PropertyChangeEvent event) throws RollbackOperationException,
+                    RollbackBatchException {
                 String notAllowedValue = "88";
                 String makesEverythingToRollback = "42";
 
-                String newSomeInteger = (String)event.getNewValue();
+                String newSomeInteger = (String) event.getNewValue();
                 if (notAllowedValue.equals(newSomeInteger))
-                    throw new RollbackOperationException("88 is not allowed for property 'someInteger', " +
-                            "the single property someInteger is rolled back");
+                    throw new RollbackOperationException("88 is not allowed for property 'someInteger', "
+                            + "the single property someInteger is rolled back");
 
                 if (makesEverythingToRollback.equals(newSomeInteger))
-                    throw new RollbackBatchException("42 is not allowed for property 'someInteger', " +
-                            "the whole event is rolled back");
+                    throw new RollbackBatchException("42 is not allowed for property 'someInteger', "
+                            + "the whole event is rolled back");
 
             }
 
@@ -367,12 +380,14 @@ public class EventListenerOnReloadTest implements TestConstants {
             }
         });
 
-        save(target, new Properties() {{
-            setProperty("someInteger", "41");
-            setProperty("someString", "bazbar");
-            setProperty("someDouble", "2.718");
-            setProperty("nullsByDefault", "NotNullNow");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "41");
+                put("someString", "bazbar");
+                put("someDouble", "2.718");
+                put("nullsByDefault", "NotNullNow");
+            }
+        });
 
         cfg.reload();
 
@@ -390,7 +405,6 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         reloadPerformed[0] = false;
 
-
         cfg.setProperty("someInteger", "88");
         // 88 is rolled back.
         assertFalse(reloadPerformed[0]);
@@ -398,11 +412,13 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         reloadPerformed[0] = false;
 
-        save(target, new Properties() {{
-            setProperty("someInteger", "42");
-            setProperty("someString", "blahblah");
-            setProperty("someDouble", "1.234");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "42");
+                put("someString", "blahblah");
+                put("someDouble", "1.234");
+            }
+        });
 
         cfg.reload();
 
@@ -412,14 +428,15 @@ public class EventListenerOnReloadTest implements TestConstants {
         assertEquals(new Double("2.718"), cfg.someDouble());
         assertNotNull(cfg.nullsByDefault());
 
-
         reloadPerformed[0] = false;
 
-        save(target, new Properties() {{
-            setProperty("someInteger", "88");
-            setProperty("someString", "this is not rolled back");
-            setProperty("someDouble", "1.2345");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someInteger", "88");
+                put("someString", "this is not rolled back");
+                put("someDouble", "1.2345");
+            }
+        });
 
         cfg.reload();
 

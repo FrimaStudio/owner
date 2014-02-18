@@ -5,8 +5,13 @@
  * Copyright (c) 2014 Frima Studio Inc. All Rights Reserved */
 package org.aeonbits.owner;
 
+import static org.aeonbits.owner.Util.propertiesToMap;
+
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Fred Deschenes
@@ -18,6 +23,22 @@ public class OwnerProperties extends HashMap<String, Object> {
 
     public OwnerProperties() {
         super();
+    }
+
+    public OwnerProperties(int initialCapacity) {
+        super(initialCapacity);
+    }
+
+    public OwnerProperties(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor);
+    }
+
+    public OwnerProperties(Map<? extends String, ? extends Object> m) {
+        super(m);
+    }
+
+    public OwnerProperties(Properties props) {
+        this(propertiesToMap(props));
     }
 
     /**
@@ -83,5 +104,35 @@ public class OwnerProperties extends HashMap<String, Object> {
 
             into.put(key, fromValue);
         }
+    }
+
+    public Set<String> keySetRecursive() {
+        Set<String> keySet = new LinkedHashSet<String>();
+
+        recursiveKeySet(keySet, this, null);
+
+        return keySet;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void recursiveKeySet(Set<String> insertInto, Map<String, Object> root, String prefix) {
+        for (String key : root.keySet()) {
+            String realKey = buildKey(prefix, key);
+            insertInto.add(realKey);
+
+            Object value = root.get(key);
+
+            if (value instanceof Map<?, ?>) {
+                recursiveKeySet(insertInto, (Map<String, Object>) value, realKey);
+            }
+        }
+    }
+
+    private static String buildKey(String prefix, String suffix) {
+        if (prefix == null || prefix.isEmpty()) {
+            return suffix;
+        }
+
+        return prefix + KEY_SEPARATOR + suffix;
     }
 }

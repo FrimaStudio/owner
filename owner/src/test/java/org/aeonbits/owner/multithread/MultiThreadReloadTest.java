@@ -8,25 +8,25 @@
 
 package org.aeonbits.owner.multithread;
 
+import static org.aeonbits.owner.UtilTest.fileFromURL;
+import static org.aeonbits.owner.UtilTest.newArray;
+import static org.aeonbits.owner.UtilTest.save;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.net.MalformedURLException;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.OwnerProperties;
 import org.aeonbits.owner.Reloadable;
 import org.aeonbits.owner.TestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.Properties;
-
-import static org.aeonbits.owner.UtilTest.fileFromURL;
-import static org.aeonbits.owner.UtilTest.newArray;
-import static org.aeonbits.owner.UtilTest.save;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Luigi R. Viggiano
@@ -44,9 +44,11 @@ public class MultiThreadReloadTest extends MultiThreadTestBase implements TestCo
     @Before
     public void before() throws Throwable {
         synchronized (target) {
-            save(target, new Properties() {{
-                setProperty("someValue", "10");
-            }});
+            save(target, new OwnerProperties() {
+                {
+                    put("someValue", "10");
+                }
+            });
 
             reloadableConfig = ConfigFactory.create(ReloadableConfig.class);
         }
@@ -101,18 +103,22 @@ public class MultiThreadReloadTest extends MultiThreadTestBase implements TestCo
         @Override
         void execute() throws Throwable {
             synchronized (target) {
-                save(target, new Properties() {{
-                    setProperty("someValue", "20");
-                }});
+                save(target, new OwnerProperties() {
+                    {
+                        put("someValue", "20");
+                    }
+                });
 
                 cfg.reload();
             }
             yield();
 
             synchronized (target) {
-                save(target, new Properties() {{
-                    setProperty("someValue", "10");
-                }});
+                save(target, new OwnerProperties() {
+                    {
+                        put("someValue", "10");
+                    }
+                });
 
                 cfg.reload();
             }

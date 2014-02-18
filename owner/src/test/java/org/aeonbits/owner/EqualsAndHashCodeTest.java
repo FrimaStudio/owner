@@ -8,15 +8,14 @@
 
 package org.aeonbits.owner;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import org.junit.Test;
 
 /**
  * @author Luigi R. Viggiano
@@ -26,6 +25,7 @@ public class EqualsAndHashCodeTest {
     interface MyConfig extends Config {
         @DefaultValue("foo")
         String foo();
+
         @DefaultValue("bar")
         String bar();
     }
@@ -36,10 +36,10 @@ public class EqualsAndHashCodeTest {
     interface UnrelatedConfig extends Config {
         @DefaultValue("foo")
         String foo();
+
         @DefaultValue("bar")
         String bar();
     }
-
 
     @Test
     public void testWhenTwoObjectsAreEqual() {
@@ -54,9 +54,11 @@ public class EqualsAndHashCodeTest {
     @Test
     public void testWhenTwoObjectsAreNotEqual() {
         MyConfig cfg1 = ConfigFactory.create(MyConfig.class);
-        MyConfig cfg2 = ConfigFactory.create(MyConfig.class, new Properties() {{
-            setProperty("bar", "baz");
-        }});
+        MyConfig cfg2 = ConfigFactory.create(MyConfig.class, new OwnerProperties() {
+            {
+                put("bar", "baz");
+            }
+        });
 
         assertNotEquals(cfg1, cfg2);
         assertNotEquals(cfg2, cfg1);
@@ -87,12 +89,12 @@ public class EqualsAndHashCodeTest {
     @Test
     public void testWhenTwoObjectsAreSimilarProxies() {
         MyConfig cfg1 = ConfigFactory.create(MyConfig.class);
-        MyConfig cfg2 = (MyConfig) Proxy
-                .newProxyInstance(getClass().getClassLoader(), new Class[] { MyConfig.class }, new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return null;
-            }
-        });
+        MyConfig cfg2 = (MyConfig) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { MyConfig.class },
+                new InvocationHandler() {
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        return null;
+                    }
+                });
 
         assertNotEquals(cfg1, cfg2);
     }

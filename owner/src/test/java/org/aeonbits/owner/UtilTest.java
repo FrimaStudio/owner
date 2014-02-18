@@ -8,8 +8,11 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.Util.SystemProvider;
-import org.junit.Test;
+import static java.io.File.createTempFile;
+import static org.aeonbits.owner.Util.unreachableButCompilerNeedsThis;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,17 +24,11 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-import static java.io.File.createTempFile;
-import static org.aeonbits.owner.Util.unreachableButCompilerNeedsThis;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.aeonbits.owner.Util.SystemProvider;
+import org.junit.Test;
 
 /**
  * This class contains tests for the {@link Util} class as well utility methods used for test classes.
@@ -42,11 +39,11 @@ public class UtilTest {
 
     public static SystemProvider setSystem(Object system) {
         SystemProvider save = Util.system;
-        Util.system = (SystemProvider)system;
+        Util.system = (SystemProvider) system;
         return save;
     }
 
-    public static Properties getSystemProperties() {
+    public static OwnerProperties getSystemProperties() {
         return Util.system().getProperties();
     }
 
@@ -56,10 +53,10 @@ public class UtilTest {
 
     @Test
     public void testReverse() {
-        Integer[] i = {1, 2, 3, 4, 5};
+        Integer[] i = { 1, 2, 3, 4, 5 };
         Integer[] result = Util.reverse(i);
-        assertTrue(Arrays.equals(new Integer[] {1, 2, 3, 4, 5}, i));
-        assertTrue(Arrays.equals(new Integer[] {5, 4, 3, 2, 1}, result));
+        assertTrue(Arrays.equals(new Integer[] { 1, 2, 3, 4, 5 }, i));
+        assertTrue(Arrays.equals(new Integer[] { 5, 4, 3, 2, 1 }, result));
     }
 
     @Test
@@ -77,7 +74,7 @@ public class UtilTest {
         }
     }
 
-    public static void save(File target, Properties p) throws IOException {
+    public static void save(File target, OwnerProperties p) throws IOException {
         File parent = target.getParentFile();
         parent.mkdirs();
         if (isWindows()) {
@@ -89,7 +86,7 @@ public class UtilTest {
         }
     }
 
-    private static void store(File target, Properties p) throws IOException {
+    private static void store(File target, OwnerProperties p) throws IOException {
         OutputStream out = new FileOutputStream(target);
         try {
             store(out, p);
@@ -98,8 +95,9 @@ public class UtilTest {
         }
     }
 
-    private static void store(OutputStream out, Properties p) throws IOException {
-        p.store(out, "saved for test");
+    private static void store(OutputStream out, OwnerProperties p) throws IOException {
+        //TODO
+        //p.store(out, "saved for test");
     }
 
     private static boolean isWindows() {
@@ -110,7 +108,7 @@ public class UtilTest {
         target.delete();
     }
 
-    public static void saveJar(File target, String entryName, Properties props) throws IOException {
+    public static void saveJar(File target, String entryName, OwnerProperties props) throws IOException {
         File parent = target.getParentFile();
         parent.mkdirs();
         storeJar(target, entryName, props);
@@ -121,7 +119,7 @@ public class UtilTest {
             throw new IOException(String.format("Failed to overwrite %s to %s", source.toString(), target.toString()));
     }
 
-    private static void storeJar(File target, String entryName, Properties props) throws IOException {
+    private static void storeJar(File target, String entryName, OwnerProperties props) throws IOException {
         byte[] bytes = toBytes(props);
         InputStream input = new ByteArrayInputStream(bytes);
         JarOutputStream output = new JarOutputStream(new FileOutputStream(target));
@@ -138,7 +136,7 @@ public class UtilTest {
         }
     }
 
-    private static byte[] toBytes(Properties props) throws IOException {
+    private static byte[] toBytes(OwnerProperties props) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             store(out, props);
@@ -153,7 +151,7 @@ public class UtilTest {
             System.out.printf(format, args);
     }
 
-    public static <T> T  ignore() {
+    public static <T> T ignore() {
         return Util.ignore();
     }
 
@@ -161,15 +159,15 @@ public class UtilTest {
         return Util.fileFromURL(spec);
     }
 
-    public static String getSystemProperty(String key) {
+    public static Object getSystemProperty(String key) {
         return Util.system().getProperty(key);
     }
 
-    public static String getenv(String home) {
+    public static Object getenv(String home) {
         return Util.system().getenv().get(home);
     }
 
-    public static Map<String, String> getenv() {
+    public static OwnerProperties getenv() {
         return Util.system().getenv();
     }
 
@@ -193,11 +191,11 @@ public class UtilTest {
 
     @Test
     public void testExpandUserHomeOnUnix() {
-        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(
-                new Properties() {{
-                    setProperty("user.home", "/home/john");
-                }},  new HashMap<String, String>()
-        ));
+        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties() {
+            {
+                put("user.home", "/home/john");
+            }
+        }, new OwnerProperties()));
 
         try {
             assertEquals("/home/john", Util.expandUserHome("~"));
@@ -215,11 +213,11 @@ public class UtilTest {
 
     @Test
     public void testExpandUserHomeOnWindows() {
-        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(
-                new Properties() {{
-                    setProperty("user.home", "C:\\Users\\John");
-                }}, new HashMap<String, String>()
-        ));
+        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties() {
+            {
+                put("user.home", "C:\\Users\\John");
+            }
+        }, new OwnerProperties()));
         try {
             assertEquals("C:\\Users\\John", Util.expandUserHome("~"));
             assertEquals("C:\\Users\\John/foo/bar/", Util.expandUserHome("~/foo/bar/"));

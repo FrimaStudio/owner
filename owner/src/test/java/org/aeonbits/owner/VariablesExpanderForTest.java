@@ -8,13 +8,12 @@
 
 package org.aeonbits.owner;
 
-import java.util.Properties;
 
 /**
  * @author Luigi R. Viggiano
  */
 public class VariablesExpanderForTest extends VariablesExpander {
-    public VariablesExpanderForTest(Properties properties) {
+    public VariablesExpanderForTest(OwnerProperties properties) {
         super(properties);
     }
 

@@ -8,12 +8,10 @@
 
 package org.aeonbits.owner;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Luigi R. Viggiano
@@ -23,7 +21,7 @@ public class SystemVariableExpanderTest {
 
     @Before
     public void before() {
-        expander = new VariablesExpander(new Properties());
+        expander = new VariablesExpander(new OwnerProperties());
     }
 
     @Test

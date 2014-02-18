@@ -9,7 +9,6 @@
 package org.aeonbits.owner;
 
 import static org.aeonbits.owner.Util.expandUserHome;
-import static org.aeonbits.owner.Util.propertiesToMap;
 
 import java.io.Serializable;
 
@@ -27,7 +26,7 @@ class VariablesExpander implements Serializable {
     VariablesExpander(OwnerProperties props) {
         OwnerProperties variables = new OwnerProperties();
         variables.putAll(Util.system().getenv());
-        variables.putAll(propertiesToMap(Util.system().getProperties()));
+        variables.putAll(Util.system().getProperties());
         variables.putAll(props);
         substitutor = new StrSubstitutor(variables);
     }

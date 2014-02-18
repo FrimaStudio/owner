@@ -8,23 +8,23 @@
 
 package org.aeonbits.owner.examples;
 
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.Config.HotReload;
-import org.aeonbits.owner.Config.Sources;
-import org.aeonbits.owner.ConfigFactory;
-import org.aeonbits.owner.Reloadable;
-import org.aeonbits.owner.TestConstants;
-import org.aeonbits.owner.UtilTest;
-import org.aeonbits.owner.event.ReloadEvent;
-import org.aeonbits.owner.event.ReloadListener;
+import static org.aeonbits.owner.UtilTest.save;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
-import java.util.Properties;
 
-import static org.aeonbits.owner.UtilTest.save;
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.HotReload;
+import org.aeonbits.owner.Config.Sources;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.OwnerProperties;
+import org.aeonbits.owner.Reloadable;
+import org.aeonbits.owner.TestConstants;
+import org.aeonbits.owner.UtilTest;
+import org.aeonbits.owner.event.ReloadEvent;
+import org.aeonbits.owner.event.ReloadListener;
 
 /**
  * @author Luigi R. Viggiano
@@ -49,9 +49,11 @@ public class AutoReloadExample implements TestConstants {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        save(target, new Properties() {{
-            setProperty("someValue", "10");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("someValue", "10");
+            }
+        });
 
         AutoReloadConfig cfg = ConfigFactory.create(AutoReloadConfig.class);
 
@@ -61,8 +63,8 @@ public class AutoReloadExample implements TestConstants {
             }
         });
 
-        System.out.println("You can change the file " + target.getAbsolutePath() +
-                           " and see the changes reflected below");
+        System.out.println("You can change the file " + target.getAbsolutePath()
+                + " and see the changes reflected below");
         int someValue = 0;
         while (someValue >= 0) {
             someValue = cfg.someValue();

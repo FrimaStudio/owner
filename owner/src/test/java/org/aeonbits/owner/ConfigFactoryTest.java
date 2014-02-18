@@ -8,21 +8,20 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.Config.Sources;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-
 import static org.aeonbits.owner.UtilTest.save;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.aeonbits.owner.Config.Sources;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Luigi R. Viggiano
@@ -38,13 +37,15 @@ public class ConfigFactoryTest implements TestConstants {
     @Before
     public void before() throws IOException {
         ConfigFactory.setProperties(null);
-        save(new File(RESOURCES_DIR + "/myconfig.properties"), new Properties() {{
-            setProperty("someValue", "foobar");
-        }});
+        save(new File(RESOURCES_DIR + "/myconfig.properties"), new OwnerProperties() {
+            {
+                put("someValue", "foobar");
+            }
+        });
     }
 
     @Test
-    public void testSetProperty()  {
+    public void testSetProperty() {
         ConfigFactory.setProperty("mypath", RESOURCES_DIR);
 
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
@@ -63,7 +64,7 @@ public class ConfigFactoryTest implements TestConstants {
     }
 
     @Test
-    public void testSetPropertyTwice()  {
+    public void testSetPropertyTwice() {
         assertNull(ConfigFactory.setProperty("mypath", RESOURCES_DIR));
         assertEquals(RESOURCES_DIR, ConfigFactory.setProperty("mypath", RESOURCES_DIR + "-2"));
         assertEquals(RESOURCES_DIR + "-2", ConfigFactory.getProperty("mypath"));
@@ -71,7 +72,7 @@ public class ConfigFactoryTest implements TestConstants {
 
     @Test
     public void testGetProperties() {
-        ConfigFactory.getProperties().setProperty("mypath", RESOURCES_DIR);
+        ConfigFactory.getProperties().put("mypath", RESOURCES_DIR);
 
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
 
@@ -80,9 +81,11 @@ public class ConfigFactoryTest implements TestConstants {
 
     @Test
     public void testSetProperties() {
-        ConfigFactory.setProperties(new Properties() {{
-            setProperty("mypath", RESOURCES_DIR);
-        }});
+        ConfigFactory.setProperties(new OwnerProperties() {
+            {
+                put("mypath", RESOURCES_DIR);
+            }
+        });
 
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
 
@@ -148,7 +151,7 @@ public class ConfigFactoryTest implements TestConstants {
     }
 
     @Test
-    public void testSetPropertyWithoutProtocolWhenFileIsNotFound()  {
+    public void testSetPropertyWithoutProtocolWhenFileIsNotFound() {
         ConfigFactory.setProperty("mypath", RESOURCES_DIR);
         ConfigFactory.setProperty("myurl", "file:${mypath}/non-existent.properties");
 

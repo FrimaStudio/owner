@@ -8,24 +8,25 @@
 
 package org.aeonbits.owner.typeconversion;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+import java.lang.reflect.Method;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.Converter;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 /**
  * @author Luigi R. Viggiano
  */
 public class ConverterClassTest {
     private MyConfig cfg;
+
     static class Server {
         private final String name;
         private final Integer port;
@@ -37,13 +38,17 @@ public class ConverterClassTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
 
             Server server = (Server) o;
 
-            if (!name.equals(server.name)) return false;
-            if (!port.equals(server.port)) return false;
+            if (!name.equals(server.name))
+                return false;
+            if (!port.equals(server.port))
+                return false;
 
             return true;
         }
@@ -55,7 +60,8 @@ public class ConverterClassTest {
     }
 
     public static class ServerConverter implements Converter<Server> {
-        public Server convert(Method targetMethod, String text) {
+        public Server convert(Method targetMethod, Object input) {
+            String text = (String) input;
             String[] split = text.split(":", -1);
             String name = split[0];
             Integer port = 80;
@@ -66,31 +72,31 @@ public class ConverterClassTest {
     }
 
     public static class ReturningNullConverter implements Converter<Server> {
-        public Server convert(Method method, String input) {
+        public Server convert(Method method, Object input) {
             return null;
         }
     }
 
     public static class ReturningUnsupportedOperationException implements Converter<Server> {
-        public Server convert(Method method, String input) {
+        public Server convert(Method method, Object input) {
             throw new UnsupportedOperationException(String.format("Cannot convert %s to %s", input, Server.class));
         }
     }
 
     public static class ReturningNullPointerException implements Converter<Server> {
-        public Server convert(Method method, String input) {
+        public Server convert(Method method, Object input) {
             throw new NullPointerException();
         }
     }
 
     public abstract static class CantBeInstantiated implements Converter<Server> { // abstract
-        public Server convert(Method method, String input) {
+        public Server convert(Method method, Object input) {
             return null;
         }
     }
 
     private static class CantBeAccessed implements Converter<Server> { // private
-        public Server convert(Method method, String input) {
+        public Server convert(Method method, Object input) {
             return null;
         }
     }
@@ -139,7 +145,6 @@ public class ConverterClassTest {
         assertEquals(42, cfg.overridden());
     }
 
-
     @Test
     public void testSingleObject() {
         assertEquals(new Server("foobar.com", 8080), cfg.server());
@@ -147,11 +152,8 @@ public class ConverterClassTest {
 
     @Test
     public void testArrayObject() {
-        Server[] expected = new Server[] {
-                new Server("google.com", 80),
-                new Server("yahoo.com", 8080),
-                new Server("owner.aeonbits.org", 4000)
-        };
+        Server[] expected = new Server[] { new Server("google.com", 80), new Server("yahoo.com", 8080),
+                new Server("owner.aeonbits.org", 4000) };
         assertArrayEquals(expected, cfg.servers());
     }
 
@@ -191,7 +193,7 @@ public class ConverterClassTest {
     }
 
     public static class OverridesIntegerConversion implements Converter {
-        public Object convert(Method method, String input) {
+        public Object convert(Method method, Object input) {
             return 42;
         }
     }

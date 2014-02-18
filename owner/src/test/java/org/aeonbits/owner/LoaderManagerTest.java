@@ -15,14 +15,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.loaders.Loader;
 import org.aeonbits.owner.loaders.PropertiesLoader;
-import org.aeonbits.owner.loaders.XMLLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,25 +58,25 @@ public class LoaderManagerTest implements TestConstants {
 
     @Test(expected = UnsupportedOperationException.class)
     public void testProxyCreationWhenLoaderCantBeRisolvedForGivenURL() {
-        Factory factory = new DefaultFactory(scheduler, new Properties()) {
+        Factory factory = new DefaultFactory(scheduler, new OwnerProperties()) {
             {
                 loadersManager.clear();
             }
         };
-        factory.registerLoader(new XMLLoader());
+        factory.registerLoader(new PropertiesLoader());
         factory.create(MyConfig.class);
     }
 
     @Test
     public void testProxyCreationInNormalSituation() {
-        Factory factory = new DefaultFactory(scheduler, new Properties());
+        Factory factory = new DefaultFactory(scheduler, new OwnerProperties());
         MyConfigDefaultSpec cfg = factory.create(MyConfigDefaultSpec.class);
         assertEquals("bar", cfg.foo());
     }
 
     @Test
     public void testProxyCreationWhenLoaderReturnsFooBarAsDefaultSpec() {
-        Factory factory = new DefaultFactory(scheduler, new Properties()) {
+        Factory factory = new DefaultFactory(scheduler, new OwnerProperties()) {
             {
                 loadersManager.clear();
             }
@@ -99,7 +96,7 @@ public class LoaderManagerTest implements TestConstants {
 
     @Test
     public void testProxyCreationWhenLoaderReturnsNullAsDefaultSpec() {
-        Factory factory = new DefaultFactory(scheduler, new Properties()) {
+        Factory factory = new DefaultFactory(scheduler, new OwnerProperties()) {
             {
                 loadersManager.clear();
             }
@@ -138,7 +135,7 @@ public class LoaderManagerTest implements TestConstants {
             return false;
         }
 
-        public void load(Map<String, Object> result, InputStream input) throws IOException {
+        public void load(OwnerProperties result, InputStream input) throws IOException {
         }
 
         public String defaultSpecFor(String urlPrefix) {

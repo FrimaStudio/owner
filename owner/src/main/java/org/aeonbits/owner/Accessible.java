@@ -8,6 +8,7 @@
 
 package org.aeonbits.owner;
 
+import java.util.Set;
 
 /**
  * <p>Allows a <tt>Config</tt> object to access the contents of the properties, providing utility methods to perform
@@ -56,4 +57,6 @@ public interface Accessible extends Config {
      * @since 1.0.4
      */
     Object getProperty(String key, Object defaultValue);
+
+    Set<String> propertyNames();
 }

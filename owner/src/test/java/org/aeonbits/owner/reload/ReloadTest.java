@@ -8,9 +8,20 @@
 
 package org.aeonbits.owner.reload;
 
+import static org.aeonbits.owner.UtilTest.fileFromURL;
+import static org.aeonbits.owner.UtilTest.save;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.io.File;
+import java.net.MalformedURLException;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.OwnerProperties;
 import org.aeonbits.owner.Reloadable;
 import org.aeonbits.owner.TestConstants;
 import org.aeonbits.owner.event.ReloadEvent;
@@ -25,17 +36,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.Properties;
-
-import static org.aeonbits.owner.UtilTest.fileFromURL;
-import static org.aeonbits.owner.UtilTest.save;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * @author Luigi R. Viggiano
@@ -54,9 +54,11 @@ public class ReloadTest implements TestConstants {
 
     @Before
     public void before() throws Throwable {
-        save(target, new Properties() {{
-            setProperty("minimumAge", "18");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("minimumAge", "18");
+            }
+        });
     }
 
     @Sources(SPEC)
@@ -70,9 +72,11 @@ public class ReloadTest implements TestConstants {
 
         assertEquals(Integer.valueOf(18), cfg.minimumAge());
 
-        save(target, new Properties() {{
-            setProperty("minimumAge", "21");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("minimumAge", "21");
+            }
+        });
 
         cfg.reload();
         assertEquals(Integer.valueOf(21), cfg.minimumAge());
@@ -84,14 +88,16 @@ public class ReloadTest implements TestConstants {
 
     @Test
     public void testReloadWithImportedProperties() throws Throwable {
-        Properties props = new Properties() {{
-            setProperty("minimumAge", "18");
-        }};
+        OwnerProperties props = new OwnerProperties() {
+            {
+                put("minimumAge", "18");
+            }
+        };
 
         ReloadImportConfig cfg = ConfigFactory.create(ReloadImportConfig.class, props);
         assertEquals(Integer.valueOf(18), cfg.minimumAge());
 
-        props.setProperty("minimumAge", "21"); // changing props doesn't reflect to cfg immediately
+        props.put("minimumAge", "21"); // changing props doesn't reflect to cfg immediately
         assertEquals(Integer.valueOf(18), cfg.minimumAge());
 
         cfg.reload(); // the config gets reloaded, so the change in props gets reflected

@@ -10,31 +10,28 @@ package org.aeonbits.owner;
 
 import org.aeonbits.owner.Util.SystemProvider;
 
-import java.util.Map;
-import java.util.Properties;
-
 /**
  * @author Luigi R. Viggiano
  */
 public class SystemProviderForTest implements SystemProvider {
 
-    private final Properties system;
-    private final Map<String, String> env;
+    private final OwnerProperties system;
+    private final OwnerProperties env;
 
-    public SystemProviderForTest(Properties system, Map<String, String> env) {
+    public SystemProviderForTest(OwnerProperties system, OwnerProperties env) {
         this.system = system;
         this.env = env;
     }
 
-    public String getProperty(String key) {
-        return system.getProperty(key);
+    public Object getProperty(String key) {
+        return system.get(key);
     }
 
-    public Map<String, String> getenv() {
+    public OwnerProperties getenv() {
         return env;
     }
 
-    public Properties getProperties() {
+    public OwnerProperties getProperties() {
         return system;
     }
 }

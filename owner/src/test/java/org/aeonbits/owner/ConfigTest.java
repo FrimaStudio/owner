@@ -8,17 +8,16 @@
 
 package org.aeonbits.owner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Luigi R. Viggiano
@@ -58,7 +57,7 @@ public class ConfigTest {
 
     @Test
     public void shouldDoReplacements() {
-        SampleConfig config = ConfigFactory.create(SampleConfig.class, new Properties());
+        SampleConfig config = ConfigFactory.create(SampleConfig.class, new OwnerProperties());
         assertEquals("Hello Luigi.", config.hello("Luigi"));
     }
 

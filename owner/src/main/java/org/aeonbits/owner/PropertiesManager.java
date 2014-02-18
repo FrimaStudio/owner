@@ -206,8 +206,8 @@ class PropertiesManager implements Reloadable, Accessible {
             listener.reloadPerformed(reloadEvent);
     }
 
-    private ReloadEvent fireBeforeReloadEvent(List<PropertyChangeEvent> events, Map<String, Object> oldProperties,
-            Map<String, Object> newProperties) throws RollbackBatchException {
+    private ReloadEvent fireBeforeReloadEvent(List<PropertyChangeEvent> events, OwnerProperties oldProperties,
+            OwnerProperties newProperties) throws RollbackBatchException {
         ReloadEvent reloadEvent = new ReloadEvent(proxy, events, oldProperties, newProperties);
         for (ReloadListener listener : reloadListeners)
             if (listener instanceof TransactionalReloadListener)
@@ -329,8 +329,7 @@ class PropertiesManager implements Reloadable, Accessible {
     public Set<String> propertyNames() {
         readLock.lock();
         try {
-            //TODO: Make recursive
-            LinkedHashSet<String> result = new LinkedHashSet<String>(properties.keySet());
+            LinkedHashSet<String> result = new LinkedHashSet<String>(properties.keySetRecursive());
             return result;
         } finally {
             readLock.unlock();

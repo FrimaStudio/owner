@@ -8,19 +8,19 @@
 
 package org.aeonbits.owner.importedprops;
 
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.Config.Sources;
-import org.aeonbits.owner.ConfigFactory;
-import org.aeonbits.owner.TestConstants;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-
 import static org.aeonbits.owner.UtilTest.fileFromURL;
 import static org.aeonbits.owner.UtilTest.save;
 import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.Sources;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.OwnerProperties;
+import org.aeonbits.owner.TestConstants;
+import org.junit.Test;
 
 /**
  * @author Luigi R. Viggiano
@@ -44,9 +44,9 @@ public class ImportConfigTest implements TestConstants {
 
     @Test
     public void testImport() {
-        Properties props = new Properties();
-        props.setProperty("foo", "pineapple");
-        props.setProperty("bar", "lime");
+        OwnerProperties props = new OwnerProperties();
+        props.put("foo", "pineapple");
+        props.put("bar", "lime");
         ImportConfig cfg = ConfigFactory.create(ImportConfig.class, props); // props imported!
         assertEquals("pineapple", cfg.foo());
         assertEquals("lime", cfg.bar());
@@ -55,13 +55,13 @@ public class ImportConfigTest implements TestConstants {
 
     @Test
     public void testImportOrder() {
-        Properties p1 = new Properties();
-        p1.setProperty("foo", "pineapple");
-        p1.setProperty("bar", "lime");
+        OwnerProperties p1 = new OwnerProperties();
+        p1.put("foo", "pineapple");
+        p1.put("bar", "lime");
 
-        Properties p2 = new Properties();
-        p2.setProperty("bar", "grapefruit");
-        p2.setProperty("baz", "blackberry");
+        OwnerProperties p2 = new OwnerProperties();
+        p2.put("bar", "grapefruit");
+        p2.put("baz", "blackberry");
 
         ImportConfig cfg = ConfigFactory.create(ImportConfig.class, p1, p2); // props imported!
 
@@ -74,14 +74,16 @@ public class ImportConfigTest implements TestConstants {
     public void testThatImportedPropertiesHaveHigherPriorityThanPropertiesLoadedBySources() throws IOException {
         File target = fileFromURL(SPEC);
 
-        save(target, new Properties() {{
-            setProperty("foo", "strawberries");
-        }});
+        save(target, new OwnerProperties() {
+            {
+                put("foo", "strawberries");
+            }
+        });
 
         try {
-            Properties props = new Properties();
-            props.setProperty("foo", "pineapple");
-            props.setProperty("bar", "lime");
+            OwnerProperties props = new OwnerProperties();
+            props.put("foo", "pineapple");
+            props.put("bar", "lime");
             ImportConfig cfg = ConfigFactory.create(ImportConfig.class, props); // props imported!
             assertEquals("pineapple", cfg.foo());
             assertEquals("lime", cfg.bar());
@@ -101,13 +103,17 @@ public class ImportConfigTest implements TestConstants {
         assertEquals(Integer.valueOf(18), cfg.minAge());
 
         ImportedPropertiesHaveHigherPriority cfg2 = ConfigFactory.create(ImportedPropertiesHaveHigherPriority.class,
-                new Properties() {{
-                    setProperty("minAge", "21");
-                }},
+                new OwnerProperties() {
+                    {
+                        put("minAge", "21");
+                    }
+                },
 
-                new Properties() {{
-                    setProperty("minAge", "22");
-                }}
+                new OwnerProperties() {
+                    {
+                        put("minAge", "22");
+                    }
+                }
 
         );
 

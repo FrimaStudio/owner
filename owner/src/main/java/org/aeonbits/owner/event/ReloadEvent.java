@@ -12,7 +12,8 @@ import static java.util.Collections.unmodifiableList;
 
 import java.beans.PropertyChangeEvent;
 import java.util.List;
-import java.util.Map;
+
+import org.aeonbits.owner.OwnerProperties;
 
 /**
  * A semantic event which indicates that a reload occurred.
@@ -24,8 +25,8 @@ import java.util.Map;
 public class ReloadEvent extends Event {
 
     private final List<PropertyChangeEvent> events;
-    private final Map<String, Object> oldProperties;
-    private final Map<String, Object> newProperties;
+    private final OwnerProperties oldProperties;
+    private final OwnerProperties newProperties;
 
     /**
      * Constructs a prototypical Event.
@@ -37,8 +38,8 @@ public class ReloadEvent extends Event {
      * @param newProperties the properties after the reload.
      * @throws IllegalArgumentException if source is null.
      */
-    public ReloadEvent(Object source, List<PropertyChangeEvent> events, Map<String, Object> oldProperties,
-            Map<String, Object> newProperties) {
+    public ReloadEvent(Object source, List<PropertyChangeEvent> events, OwnerProperties oldProperties,
+            OwnerProperties newProperties) {
         super(source);
         this.events = unmodifiableList(events);
 
@@ -63,7 +64,7 @@ public class ReloadEvent extends Event {
      *
      * @return the properties before the reload.
      */
-    public Map<String, Object> getOldProperties() {
+    public OwnerProperties getOldProperties() {
         return oldProperties;
     }
 
@@ -72,7 +73,7 @@ public class ReloadEvent extends Event {
      *
      * @return the properties after the reload.
      */
-    public Map<String, Object> getNewProperties() {
+    public OwnerProperties getNewProperties() {
         return newProperties;
     }
 

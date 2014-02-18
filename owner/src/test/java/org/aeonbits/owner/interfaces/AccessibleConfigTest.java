@@ -8,16 +8,12 @@
 
 package org.aeonbits.owner.interfaces;
 
-import org.aeonbits.owner.Accessible;
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.ConfigFactory;
-import org.aeonbits.owner.LoadersManagerForTest;
-import org.aeonbits.owner.PropertiesManagerForTest;
-import org.aeonbits.owner.VariablesExpanderForTest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,16 +22,20 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import org.aeonbits.owner.Accessible;
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.LoadersManagerForTest;
+import org.aeonbits.owner.OwnerProperties;
+import org.aeonbits.owner.PropertiesManagerForTest;
+import org.aeonbits.owner.VariablesExpanderForTest;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Luigi R. Viggiano
@@ -46,7 +46,7 @@ public class AccessibleConfigTest {
     private ScheduledExecutorService scheduler;
     private LoadersManagerForTest loaders = new LoadersManagerForTest();
 
-    private final VariablesExpanderForTest expander = new VariablesExpanderForTest(new Properties());
+    private final VariablesExpanderForTest expander = new VariablesExpanderForTest(new OwnerProperties());
 
     public static interface AccessibleConfig extends Config, Accessible {
         @DefaultValue("Bohemian Rapsody - Queen")
@@ -60,8 +60,8 @@ public class AccessibleConfigTest {
     @Test
     public void testListPrintStream() throws IOException {
         ByteArrayOutputStream expected = new ByteArrayOutputStream();
-        PropertiesManagerForTest manager =
-                new PropertiesManagerForTest(AccessibleConfig.class, new Properties(), scheduler, expander, loaders);
+        PropertiesManagerForTest manager = new PropertiesManagerForTest(AccessibleConfig.class, new OwnerProperties(),
+                scheduler, expander, loaders);
         manager.load().list(new PrintStream(expected, true));
 
         AccessibleConfig config = ConfigFactory.create(AccessibleConfig.class);
@@ -74,8 +74,8 @@ public class AccessibleConfigTest {
     @Test
     public void testListPrintWriter() throws IOException {
         StringWriter expected = new StringWriter();
-        PropertiesManagerForTest manager =
-                new PropertiesManagerForTest(AccessibleConfig.class, new Properties(), scheduler, expander, loaders);
+        PropertiesManagerForTest manager = new PropertiesManagerForTest(AccessibleConfig.class, new OwnerProperties(),
+                scheduler, expander, loaders);
         manager.load().list(new PrintWriter(expected, true));
 
         AccessibleConfig config = ConfigFactory.create(AccessibleConfig.class);

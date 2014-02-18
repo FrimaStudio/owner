@@ -8,14 +8,15 @@
 
 package org.aeonbits.owner.importedprops;
 
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.ConfigFactory;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.PrintStream;
 
-import static org.junit.Assert.assertEquals;
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.OwnerProperties;
+import org.junit.Test;
 
 /**
  * @author Luigi R. Viggiano
@@ -39,8 +40,11 @@ public class SystemPropertiesAndEnvTest {
 
     @Test
     public void testSystemEnvProperties() {
-        SystemEnvProperties cfg = ConfigFactory.create(SystemEnvProperties
-                .class, System.getProperties(), System.getenv());
+
+        OwnerProperties systemProps = new OwnerProperties(System.getProperties());
+        OwnerProperties env = new OwnerProperties(System.getenv());
+
+        SystemEnvProperties cfg = ConfigFactory.create(SystemEnvProperties.class, systemProps, env);
         assertEquals(File.separator, cfg.fileSeparator());
         assertEquals(System.getProperty("java.home"), cfg.javaHome());
         assertEquals(System.getenv().get("HOME"), cfg.home());

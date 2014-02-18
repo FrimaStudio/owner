@@ -8,14 +8,12 @@
 
 package org.aeonbits.owner.variableexpansion;
 
+import static org.junit.Assert.assertEquals;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.OwnerProperties;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests properties resolution.
@@ -37,18 +35,22 @@ public class PropertyNotSetTest {
 
     @Test
     public void testPropertySet() {
-        Map<String, String> ctx = new HashMap<String, String>() {{
-            put("world", "Earth");
-        }};
+        OwnerProperties ctx = new OwnerProperties() {
+            {
+                put("world", "Earth");
+            }
+        };
         MyConfig cfg = ConfigFactory.create(MyConfig.class, ctx);
         assertEquals("Hello Earth.", cfg.foo());
     }
 
     @Test
     public void testPropertyChanged() {
-        Map<String, String> ctx = new HashMap<String, String>() {{
-            put("world", "Earth");
-        }};
+        OwnerProperties ctx = new OwnerProperties() {
+            {
+                put("world", "Earth");
+            }
+        };
         MyConfig cfg = ConfigFactory.create(MyConfig.class, ctx);
 
         ctx.put("world", "Mars");

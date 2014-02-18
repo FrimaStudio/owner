@@ -8,26 +8,25 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.event.ReloadListener;
-
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
+
+import org.aeonbits.owner.event.ReloadListener;
 
 /**
  * @author Luigi R. Viggiano
  */
 public class PropertiesManagerForTest extends PropertiesManager {
-    public PropertiesManagerForTest(Class<? extends Config> clazz, Properties properties,
-                             ScheduledExecutorService scheduler, VariablesExpander expander, LoadersManager loaders,
-                             Map<?, ?>... imports) {
+    public PropertiesManagerForTest(Class<? extends Config> clazz, OwnerProperties properties,
+            ScheduledExecutorService scheduler, VariablesExpander expander, LoadersManager loaders,
+            Map<String, Object>... imports) {
         super(clazz, properties, scheduler, expander, loaders, imports);
     }
 
     @Override
-    public Properties load() {
+    public OwnerProperties load() {
         return super.load();
     }
 

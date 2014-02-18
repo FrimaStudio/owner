@@ -8,26 +8,6 @@
 
 package org.aeonbits.owner.event;
 
-import org.aeonbits.owner.ConfigFactory;
-import org.aeonbits.owner.LoadersManagerForTest;
-import org.aeonbits.owner.Mutable;
-import org.aeonbits.owner.PropertiesManagerForTest;
-import org.aeonbits.owner.VariablesExpanderForTest;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-
-import java.beans.PropertyChangeEvent;
-import java.io.ByteArrayInputStream;
-import java.io.StringReader;
-import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
-
 import static org.aeonbits.owner.event.PropertyChangeMatcher.matches;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -46,6 +26,26 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.beans.PropertyChangeEvent;
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
+import java.util.concurrent.ScheduledExecutorService;
+
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.LoadersManagerForTest;
+import org.aeonbits.owner.Mutable;
+import org.aeonbits.owner.OwnerProperties;
+import org.aeonbits.owner.PropertiesManagerForTest;
+import org.aeonbits.owner.VariablesExpanderForTest;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+
 /**
  * @author Luigi R. Viggiano
  */
@@ -56,7 +56,7 @@ public class EventListenerTest {
     private TransactionalPropertyChangeListener propertyChangeListener;
 
     @Mock
-    private Properties props;
+    private OwnerProperties props;
 
     @Mock
     private ScheduledExecutorService scheduler;
@@ -106,14 +106,14 @@ public class EventListenerTest {
 
     @Test
     public void testSetPropertyThrowingRollbackOperationException() throws Throwable {
-        doThrow(new RollbackOperationException()).when(propertyChangeListener).beforePropertyChange(any
-                (PropertyChangeEvent.class));
+        doThrow(new RollbackOperationException()).when(propertyChangeListener).beforePropertyChange(
+                any(PropertyChangeEvent.class));
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
         cfg.addPropertyChangeListener(propertyChangeListener);
 
         assertEquals("13", cfg.primeNumber());
 
-        cfg.setProperty("primeNumber", "17");       // is rolled back!
+        cfg.setProperty("primeNumber", "17"); // is rolled back!
         assertEquals("13", cfg.primeNumber());
 
         PropertyChangeEvent expectedEvent = new PropertyChangeEvent(cfg, "primeNumber", "13", "17");
@@ -122,7 +122,6 @@ public class EventListenerTest {
         inOrder.verify(propertyChangeListener, never()).propertyChange(argThat(matches(expectedEvent)));
         inOrder.verifyNoMoreInteractions();
     }
-
 
     @Test
     public void testRemoveProperty() throws Throwable {
@@ -144,15 +143,15 @@ public class EventListenerTest {
 
     @Test
     public void testRemovePropertyThrowingRollbackOperationException() throws Throwable {
-        doThrow(new RollbackOperationException()).when(propertyChangeListener).beforePropertyChange(any
-                (PropertyChangeEvent.class));
+        doThrow(new RollbackOperationException()).when(propertyChangeListener).beforePropertyChange(
+                any(PropertyChangeEvent.class));
 
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
         cfg.addPropertyChangeListener(propertyChangeListener);
 
         assertEquals("13", cfg.primeNumber());
 
-        cfg.removeProperty("primeNumber");  // rolled back!
+        cfg.removeProperty("primeNumber"); // rolled back!
         thingsAreRolledBack(cfg);
     }
 
@@ -178,7 +177,6 @@ public class EventListenerTest {
         inOrder.verifyNoMoreInteractions();
     }
 
-
     @Test
     public void testClear() throws Throwable {
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
@@ -201,8 +199,8 @@ public class EventListenerTest {
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
         cfg.addPropertyChangeListener(propertyChangeListener);
 
-        doThrow(new RollbackOperationException()).when(propertyChangeListener).beforePropertyChange(any
-                (PropertyChangeEvent.class));
+        doThrow(new RollbackOperationException()).when(propertyChangeListener).beforePropertyChange(
+                any(PropertyChangeEvent.class));
 
         cfg.clear();
 
@@ -238,8 +236,8 @@ public class EventListenerTest {
         Server cfg = ConfigFactory.create(Server.class);
         cfg.addPropertyChangeListener(propertyChangeListener);
 
-        doNothing().doNothing().doThrow(new RollbackBatchException())
-                .when(propertyChangeListener).beforePropertyChange(any(PropertyChangeEvent.class));
+        doNothing().doNothing().doThrow(new RollbackBatchException()).when(propertyChangeListener)
+                .beforePropertyChange(any(PropertyChangeEvent.class));
 
         cfg.clear();
 
@@ -250,7 +248,6 @@ public class EventListenerTest {
         verify(propertyChangeListener, times(3)).beforePropertyChange(any(PropertyChangeEvent.class));
         verify(propertyChangeListener, never()).propertyChange(any(PropertyChangeEvent.class));
     }
-
 
     @Test
     public void testLoadInputStream() throws Throwable {
@@ -271,9 +268,7 @@ public class EventListenerTest {
     }
 
     private String getPropertiesTextForLoad() {
-        return "hostname = foobar\n" +
-                "port = 80\n" +
-                "protocol = http\n";
+        return "hostname = foobar\n" + "port = 80\n" + "protocol = http\n";
     }
 
     @Test
@@ -341,17 +336,15 @@ public class EventListenerTest {
     }
 
     private String getPropertiesAsText() {
-        return "hostname = foobar\n" +
-                "port = 80\n" +
-                "protocol = ftp\n";
+        return "hostname = foobar\n" + "port = 80\n" + "protocol = ftp\n";
     }
 
     private Server prepareLoadForRollbackBatch() throws RollbackOperationException, RollbackBatchException {
         Server server = ConfigFactory.create(Server.class);
         server.addPropertyChangeListener(propertyChangeListener);
 
-        doNothing().doNothing().doThrow(new RollbackBatchException())
-                .when(propertyChangeListener).beforePropertyChange(any(PropertyChangeEvent.class));
+        doNothing().doNothing().doThrow(new RollbackBatchException()).when(propertyChangeListener)
+                .beforePropertyChange(any(PropertyChangeEvent.class));
         return server;
     }
 
@@ -409,8 +402,8 @@ public class EventListenerTest {
 
     @Before
     public void before() {
-        propertiesManager = new PropertiesManagerForTest(Server.class, props, scheduler,
-                new VariablesExpanderForTest(new Properties()), loaders);
+        propertiesManager = new PropertiesManagerForTest(Server.class, props, scheduler, new VariablesExpanderForTest(
+                new OwnerProperties()), loaders);
     }
 
     @Test

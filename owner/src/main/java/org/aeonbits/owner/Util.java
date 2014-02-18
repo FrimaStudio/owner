@@ -39,11 +39,11 @@ abstract class Util {
     }
 
     interface SystemProvider {
-        String getProperty(String key);
+        Object getProperty(String key);
 
-        Map<String, String> getenv();
+        OwnerProperties getenv();
 
-        Properties getProperties();
+        OwnerProperties getProperties();
     }
 
     static TimeProvider timeProvider = new TimeProvider() {
@@ -57,12 +57,12 @@ abstract class Util {
             return System.getProperty(key);
         }
 
-        public Map<String, String> getenv() {
-            return System.getenv();
+        public OwnerProperties getenv() {
+            return new OwnerProperties(System.getenv());
         }
 
-        public Properties getProperties() {
-            return System.getProperties();
+        public OwnerProperties getProperties() {
+            return new OwnerProperties(System.getProperties());
         }
     };
 
@@ -85,11 +85,11 @@ abstract class Util {
 
     static String expandUserHome(String text) {
         if (text.equals("~"))
-            return system.getProperty("user.home");
+            return (String) system.getProperty("user.home");
         if (text.indexOf("~/") == 0 || text.indexOf("file:~/") == 0 || text.indexOf("jar:file:~/") == 0)
-            return text.replaceFirst("~/", fixBackslashForRegex(system.getProperty("user.home")) + "/");
+            return text.replaceFirst("~/", fixBackslashForRegex((String) system.getProperty("user.home")) + "/");
         if (text.indexOf("~\\") == 0 || text.indexOf("file:~\\") == 0 || text.indexOf("jar:file:~\\") == 0)
-            return text.replaceFirst("~\\\\", fixBackslashForRegex(system.getProperty("user.home")) + "\\\\");
+            return text.replaceFirst("~\\\\", fixBackslashForRegex((String) system.getProperty("user.home")) + "\\\\");
         return text;
     }
 

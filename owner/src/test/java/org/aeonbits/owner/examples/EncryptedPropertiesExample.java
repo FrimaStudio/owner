@@ -1,11 +1,11 @@
 package org.aeonbits.owner.examples;
 
+import java.lang.reflect.Method;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.Converter;
 import org.apache.commons.codec.binary.Base64;
-
-import java.lang.reflect.Method;
 
 /**
  *  To encrypt the password:
@@ -23,9 +23,9 @@ public class EncryptedPropertiesExample {
     }
 
     public static class DecryptConverter implements Converter {
-        public Object convert(Method method, String input) {
+        public Object convert(Method method, Object input) {
             String key = System.getProperty("example.encryption.key");
-            return new String(xor(Base64.decodeBase64(input), key.getBytes()));
+            return new String(xor(Base64.decodeBase64((String) input), key.getBytes()));
         }
     }
 
@@ -51,4 +51,3 @@ public class EncryptedPropertiesExample {
         return output;
     }
 }
-

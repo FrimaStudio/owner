@@ -80,7 +80,7 @@ enum Converters {
             if (annotation == null)
                 return null;
 
-            Class<? extends Converter> converterClass = annotation.value();
+            Class<? extends Converter<?>> converterClass = annotation.value();
             Converter<?> converter;
             try {
                 converter = converterClass.newInstance();

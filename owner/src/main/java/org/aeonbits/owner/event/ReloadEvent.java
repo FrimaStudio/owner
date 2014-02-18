@@ -23,6 +23,7 @@ import org.aeonbits.owner.OwnerProperties;
  * @since 1.0.4
  */
 public class ReloadEvent extends Event {
+    private static final long serialVersionUID = 7209574053351432307L;
 
     private final List<PropertyChangeEvent> events;
     private final OwnerProperties oldProperties;

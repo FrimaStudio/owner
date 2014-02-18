@@ -76,7 +76,6 @@ abstract class Util {
         return copy;
     }
 
-    @SuppressWarnings("unchecked")
     static <T> T[] reverse(T[] array) {
         T[] copy = array.clone();
         Collections.reverse(asList(copy));

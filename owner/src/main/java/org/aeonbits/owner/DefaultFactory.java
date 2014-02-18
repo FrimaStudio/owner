@@ -10,7 +10,6 @@ package org.aeonbits.owner;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
 
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.aeonbits.owner.loaders.Loader;
@@ -33,7 +32,7 @@ class DefaultFactory implements Factory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Config> T create(Class<? extends T> clazz, Map<String, Object>... imports) {
+    public <T extends Config> T create(Class<? extends T> clazz, OwnerProperties... imports) {
         Class<?>[] interfaces = new Class<?>[] { clazz };
         VariablesExpander expander = new VariablesExpander(props);
         PropertiesManager manager = new PropertiesManager(clazz, new OwnerProperties(), scheduler, expander,

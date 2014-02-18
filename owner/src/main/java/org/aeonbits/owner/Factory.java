@@ -8,8 +8,6 @@
 
 package org.aeonbits.owner;
 
-import java.util.Map;
-
 import org.aeonbits.owner.loaders.Loader;
 
 /**
@@ -29,7 +27,7 @@ public interface Factory {
      * @return an object implementing the given interface, which maps methods to property values.
      * @since 1.0.5
      */
-    <T extends Config> T create(Class<? extends T> clazz, Map<String, Object>... imports);
+    <T extends Config> T create(Class<? extends T> clazz, OwnerProperties... imports);
 
     /**
      * Returns the value for a given property.

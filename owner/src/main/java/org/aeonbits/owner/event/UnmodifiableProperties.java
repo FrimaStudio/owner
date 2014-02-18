@@ -8,19 +8,20 @@
 
 package org.aeonbits.owner.event;
 
+import static java.util.Collections.unmodifiableCollection;
+import static java.util.Collections.unmodifiableSet;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import static java.util.Collections.unmodifiableCollection;
-import static java.util.Collections.unmodifiableSet;
-
 /**
  * @author Luigi R. Viggiano
  */
 class UnmodifiableProperties extends Properties {
+    private static final long serialVersionUID = 5929163730755799288L;
 
     public UnmodifiableProperties(Properties properties) {
         fill(properties);

@@ -31,6 +31,7 @@ import org.aeonbits.owner.loaders.YAMLLoader;
  * @since 1.0.5
  */
 class LoadersManager implements Serializable {
+    private static final long serialVersionUID = -8315860156862253695L;
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final List<Loader> loaders = new LinkedList<Loader>();

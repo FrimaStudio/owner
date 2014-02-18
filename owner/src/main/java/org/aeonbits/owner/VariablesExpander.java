@@ -20,6 +20,7 @@ import java.io.Serializable;
  * @author Luigi R. Viggiano
  */
 class VariablesExpander implements Serializable {
+    private static final long serialVersionUID = -1463454061620014053L;
 
     private final StrSubstitutor substitutor;
 

@@ -10,7 +10,6 @@ package org.aeonbits.owner;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
@@ -63,7 +62,7 @@ public final class ConfigFactory {
      * @return an object implementing the given interface, which maps methods to property values.
      */
     @SafeVarargs
-    public static <T extends Config> T create(Class<? extends T> clazz, Map<String, Object>... imports) {
+    public static <T extends Config> T create(Class<? extends T> clazz, OwnerProperties... imports) {
         return INSTANCE.create(clazz, imports);
     }
 

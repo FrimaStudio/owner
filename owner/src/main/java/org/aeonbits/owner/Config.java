@@ -313,7 +313,7 @@ public interface Config extends Serializable {
     @Target(METHOD)
     @Documented
     @interface ConverterClass {
-        Class<? extends Converter> value();
+        Class<? extends Converter<?>> value();
     }
 
 }

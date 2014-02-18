@@ -36,6 +36,7 @@ import org.aeonbits.owner.PropertiesManager.Delegate;
  * @author Luigi R. Viggiano
  */
 class PropertiesInvocationHandler implements InvocationHandler, Serializable {
+    private static final long serialVersionUID = -9178477775317705877L;
 
     private static final Method[] DELEGATES = findDelegates();
     private final StrSubstitutor substitutor;
@@ -46,7 +47,7 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
         this.substitutor = new StrSubstitutor(manager.load());
     }
 
-    public Object invoke(Object proxy, Method invokedMethod, Object... args) throws Throwable {
+    public Object invoke(Object proxy, Method invokedMethod, Object[] args) throws Throwable {
         propertiesManager.syncReloadCheck();
         Method delegate = getDelegateMethod(invokedMethod);
         if (delegate != null)

@@ -17,6 +17,7 @@ import java.util.EventObject;
  * @since 1.0.4
  */
 public class Event extends EventObject {
+    private static final long serialVersionUID = 8286431323436674645L;
 
     /**
      * Constructs a prototypical Event.

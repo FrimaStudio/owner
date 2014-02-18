@@ -19,6 +19,8 @@ import org.yaml.snakeyaml.Yaml;
  * @author Fred Deschenes
  */
 public class YAMLLoader implements Loader {
+    private static final long serialVersionUID = 3232703927181588810L;
+
     public final static String YAML_EXTENSION = ".yaml";
 
     public boolean accept(URL url) {

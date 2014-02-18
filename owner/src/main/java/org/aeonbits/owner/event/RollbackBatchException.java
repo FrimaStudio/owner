@@ -17,6 +17,7 @@ package org.aeonbits.owner.event;
  * @since 1.0.5
  */
 public class RollbackBatchException extends RollbackException {
+    private static final long serialVersionUID = -2375826682480512831L;
 
     public RollbackBatchException() {
         super();

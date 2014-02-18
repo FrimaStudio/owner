@@ -56,9 +56,10 @@ import org.aeonbits.owner.event.TransactionalReloadListener;
  * @author Luigi R. Viggiano
  */
 class PropertiesManager implements Reloadable, Accessible {
+    private static final long serialVersionUID = -7351207206455952345L;
 
     private final Class<? extends Config> clazz;
-    private final Map<String, Object>[] imports;
+    private final OwnerProperties[] imports;
     private final OwnerProperties properties;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReadLock readLock = lock.readLock();
@@ -75,10 +76,11 @@ class PropertiesManager implements Reloadable, Accessible {
     private Object proxy;
     private final LoadersManager loaders;
 
+    @SuppressWarnings("serial")
     final List<PropertyChangeListener> propertyChangeListeners = synchronizedList(new LinkedList<PropertyChangeListener>() {
         @Override
         public boolean remove(Object o) {
-            Iterator iterator = iterator();
+            Iterator<PropertyChangeListener> iterator = iterator();
             while (iterator.hasNext()) {
                 Object item = iterator.next();
                 if (item.equals(o)) {
@@ -96,7 +98,7 @@ class PropertiesManager implements Reloadable, Accessible {
     }
 
     PropertiesManager(Class<? extends Config> clazz, OwnerProperties properties, ScheduledExecutorService scheduler,
-            VariablesExpander expander, LoadersManager loaders, Map<String, Object>... imports) {
+            VariablesExpander expander, LoadersManager loaders, OwnerProperties... imports) {
         this.clazz = clazz;
         this.properties = properties;
         this.loaders = loaders;
@@ -189,9 +191,9 @@ class PropertiesManager implements Reloadable, Accessible {
         }
     }
 
-    private Set<?> keys(Map<?, ?>... maps) {
-        Set<Object> keys = new HashSet<Object>();
-        for (Map<?, ?> map : maps)
+    private <T extends Map<String, Object>> Set<String> keys(T... maps) {
+        Set<String> keys = new HashSet<String>();
+        for (Map<String, ?> map : maps)
             keys.addAll(map.keySet());
         return keys;
     }
@@ -249,6 +251,7 @@ class PropertiesManager implements Reloadable, Accessible {
     }
 
     private static class PropertyChangeListenerWrapper implements TransactionalPropertyChangeListener, Serializable {
+        private static final long serialVersionUID = 4989860386684360313L;
 
         private final String propertyName;
         private final PropertyChangeListener listener;
@@ -291,7 +294,7 @@ class PropertiesManager implements Reloadable, Accessible {
         return loadType.load(urls, loaders);
     }
 
-    private static void merge(OwnerProperties results, Map<String, Object>... inputs) {
+    private static <T extends Map<String, Object>> void merge(OwnerProperties results, T... inputs) {
         for (Map<String, Object> input : inputs)
             results.putAll(input);
     }
@@ -418,11 +421,10 @@ class PropertiesManager implements Reloadable, Accessible {
         return loading;
     }
 
-    private List<PropertyChangeEvent> fireBeforePropertyChangeEvents(Set keys, Map<String, Object> oldValues,
+    private List<PropertyChangeEvent> fireBeforePropertyChangeEvents(Set<String> keys, Map<String, Object> oldValues,
             Map<String, Object> newValues) throws RollbackBatchException {
         List<PropertyChangeEvent> events = new ArrayList<PropertyChangeEvent>();
-        for (Object keyObject : keys) {
-            String key = (String) keyObject;
+        for (String key : keys) {
             Object oldValue = oldValues.get(key);
             Object newValue = newValues.get(key);
             if (!eq(oldValue, newValue)) {

@@ -9,8 +9,10 @@
 package org.aeonbits.owner;
 
 import static java.util.regex.Pattern.compile;
+import static org.aeonbits.owner.Util.fixBackslashForRegex;
 
 import java.io.Serializable;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -40,6 +42,7 @@ import java.util.regex.Pattern;
  * @author Luigi R. Viggiano
  */
 class StrSubstitutor implements Serializable {
+    private static final long serialVersionUID = -6232924188811333333L;
 
     private final OwnerProperties values;
     private static final Pattern PATTERN = compile("\\$\\{(.+?)\\}");
@@ -64,19 +67,23 @@ class StrSubstitutor implements Serializable {
     String replace(String source) {
         if (source == null)
             return null;
-        //TODO: Fix this
-        /*
+
         Matcher m = PATTERN.matcher(source);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String var = m.group(1);
-            String value = values.getProperty(var);
-            String replacement = (value != null) ? replace(value) : "";
-            m.appendReplacement(sb, fixBackslashForRegex(replacement));
+            Object value = values.get(var);
+
+            //TODO: Test this, I'm pretty sure I broke something
+
+            if (value instanceof String) {
+                String text = (String) value;
+                String replacement = (text != null) ? replace(text) : "";
+                m.appendReplacement(sb, fixBackslashForRegex(replacement));
+            }
         }
         m.appendTail(sb);
-        return sb.toString();*/
-        return source;
+        return sb.toString();
     }
 
 }

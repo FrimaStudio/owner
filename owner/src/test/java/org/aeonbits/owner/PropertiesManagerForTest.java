@@ -10,7 +10,6 @@ package org.aeonbits.owner;
 
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.aeonbits.owner.event.ReloadListener;
@@ -21,7 +20,7 @@ import org.aeonbits.owner.event.ReloadListener;
 public class PropertiesManagerForTest extends PropertiesManager {
     public PropertiesManagerForTest(Class<? extends Config> clazz, OwnerProperties properties,
             ScheduledExecutorService scheduler, VariablesExpander expander, LoadersManager loaders,
-            Map<String, Object>... imports) {
+            OwnerProperties... imports) {
         super(clazz, properties, scheduler, expander, loaders, imports);
     }
 

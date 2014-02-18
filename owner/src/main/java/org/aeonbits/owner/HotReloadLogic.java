@@ -8,8 +8,10 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.Config.HotReload;
-import org.aeonbits.owner.Config.HotReloadType;
+import static org.aeonbits.owner.Config.HotReloadType.ASYNC;
+import static org.aeonbits.owner.Config.HotReloadType.SYNC;
+import static org.aeonbits.owner.Util.fileFromURL;
+import static org.aeonbits.owner.Util.now;
 
 import java.io.File;
 import java.io.Serializable;
@@ -17,15 +19,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.aeonbits.owner.Config.HotReloadType.ASYNC;
-import static org.aeonbits.owner.Config.HotReloadType.SYNC;
-import static org.aeonbits.owner.Util.fileFromURL;
-import static org.aeonbits.owner.Util.now;
+import org.aeonbits.owner.Config.HotReload;
+import org.aeonbits.owner.Config.HotReloadType;
 
 /**
  * @author Luigi R. Viggiano
  */
 class HotReloadLogic implements Serializable {
+    private static final long serialVersionUID = -3819125660720521332L;
 
     private final PropertiesManager manager;
     private final long interval;
@@ -34,6 +35,8 @@ class HotReloadLogic implements Serializable {
     private final List<WatchableFile> watchableFiles = new ArrayList<WatchableFile>();
 
     private static class WatchableFile implements Serializable {
+        private static final long serialVersionUID = -2289003623192543240L;
+
         private final File file;
         private long lastModifiedTime;
 
@@ -72,7 +75,8 @@ class HotReloadLogic implements Serializable {
     }
 
     private boolean needsReload() {
-        if (manager.isLoading()) return false;
+        if (manager.isLoading())
+            return false;
 
         long now = now();
         if (now < lastCheckTime + interval)

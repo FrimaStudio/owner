@@ -8,14 +8,10 @@
 
 package org.aeonbits.owner.serializable;
 
-import org.aeonbits.owner.Config.HotReload;
-import org.aeonbits.owner.Config.Sources;
-import org.aeonbits.owner.ConfigFactory;
-import org.aeonbits.owner.Mutable;
-import org.aeonbits.owner.TestConstants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static java.io.File.createTempFile;
+import static org.aeonbits.owner.util.Collections.map;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -27,10 +23,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import static java.io.File.createTempFile;
-import static org.aeonbits.owner.util.Collections.map;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import org.aeonbits.owner.Config.HotReload;
+import org.aeonbits.owner.Config.Sources;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.Mutable;
+import org.aeonbits.owner.OwnerProperties;
+import org.aeonbits.owner.TestConstants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Luigi R. Viggiano
@@ -38,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 public class TestSerialization implements TestConstants {
     private static final String PROPERTY_FILE_NAME = "AsyncAutoReloadConfig.properties";
 
-    private static final String SPEC = "file:"+ RESOURCES_DIR + "/" + PROPERTY_FILE_NAME;
+    private static final String SPEC = "file:" + RESOURCES_DIR + "/" + PROPERTY_FILE_NAME;
 
     private File target;
 
@@ -66,9 +67,9 @@ public class TestSerialization implements TestConstants {
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
-        MyConfig cfg = ConfigFactory.create(MyConfig.class, map("foo", "bar"));
+        MyConfig cfg = ConfigFactory.create(MyConfig.class, new OwnerProperties(map("foo", "bar")));
         assertEquals("someText", cfg.someText());
-        assertArrayEquals(new String[] {"some", "array"}, cfg.someArray());
+        assertArrayEquals(new String[] { "some", "array" }, cfg.someArray());
         cfg.addPropertyChangeListener("someText", new MyPropertyChangeListener());
 
         serialize(cfg, target);
@@ -108,6 +109,8 @@ public class TestSerialization implements TestConstants {
     }
 
     private static class MyPropertyChangeListener implements PropertyChangeListener, Serializable {
+        private static final long serialVersionUID = 7710267984014117179L;
+
         public void propertyChange(PropertyChangeEvent evt) {
         }
     }

@@ -49,11 +49,11 @@ public class AutoReloadExample implements TestConstants {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "10");
-            }
-        });
+
+        OwnerProperties props = new OwnerProperties();
+        props.put("someValue", "10");
+
+        save(target, props);
 
         AutoReloadConfig cfg = ConfigFactory.create(AutoReloadConfig.class);
 

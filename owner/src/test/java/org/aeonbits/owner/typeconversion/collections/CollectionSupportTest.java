@@ -8,10 +8,11 @@
 
 package org.aeonbits.owner.typeconversion.collections;
 
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.ConfigFactory;
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,11 +23,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.ConfigFactory;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Dmytro Chyzhykov
@@ -57,13 +57,15 @@ public class CollectionSupportTest {
         LinkedList<Integer> integerLinkedList();
 
         @DefaultValue(INTEGERS)
-        Collection rawCollection();
+        Collection<Integer> rawCollection();
 
         @DefaultValue(INTEGERS)
         CollectionWithoutDefaultConstructor<Integer> badCollection();
     }
 
     static class CollectionWithoutDefaultConstructor<E> extends ArrayList<E> {
+        private static final long serialVersionUID = 1849858311345376936L;
+
         public CollectionWithoutDefaultConstructor(int size) {
             super(size);
         }
@@ -117,4 +119,3 @@ public class CollectionSupportTest {
     }
 
 }
-

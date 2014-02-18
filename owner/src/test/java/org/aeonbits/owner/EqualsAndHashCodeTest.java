@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.aeonbits.owner.util.Collections;
 import org.junit.Test;
 
 /**
@@ -54,11 +55,7 @@ public class EqualsAndHashCodeTest {
     @Test
     public void testWhenTwoObjectsAreNotEqual() {
         MyConfig cfg1 = ConfigFactory.create(MyConfig.class);
-        MyConfig cfg2 = ConfigFactory.create(MyConfig.class, new OwnerProperties() {
-            {
-                put("bar", "baz");
-            }
-        });
+        MyConfig cfg2 = ConfigFactory.create(MyConfig.class, new OwnerProperties(Collections.map("bar", "baz")));
 
         assertNotEquals(cfg1, cfg2);
         assertNotEquals(cfg2, cfg1);

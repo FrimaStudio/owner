@@ -27,6 +27,7 @@ import org.aeonbits.owner.Reloadable;
 import org.aeonbits.owner.TestConstants;
 import org.aeonbits.owner.event.ReloadEvent;
 import org.aeonbits.owner.event.ReloadListener;
+import org.aeonbits.owner.util.Collections;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -56,11 +57,7 @@ public class AsyncAutoReloadTest extends AsyncReloadSupport implements TestConst
     @Test
     public void testReload() throws Throwable {
 
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "10");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValues", "10")));
 
         AsyncAutoReloadConfig cfg = ConfigFactory.create(AsyncAutoReloadConfig.class);
         final int[] reloadCount = { 0 };
@@ -86,11 +83,7 @@ public class AsyncAutoReloadTest extends AsyncReloadSupport implements TestConst
         assertEquals(1, reloadCount[0]);
         assertEquals(Integer.valueOf(5), cfg.someValue());
 
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "20");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValues", "20")));
         waitForReload(DELAY);
 
         assertEquals(2, reloadCount[0]);
@@ -102,11 +95,7 @@ public class AsyncAutoReloadTest extends AsyncReloadSupport implements TestConst
         assertEquals(3, reloadCount[0]);
         assertEquals(Integer.valueOf(5), cfg.someValue());
 
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "30");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValues", "30")));
         waitForReload(DELAY);
 
         assertEquals(4, reloadCount[0]);

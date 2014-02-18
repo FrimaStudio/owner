@@ -92,14 +92,13 @@ public class EventListenerOnReloadTest implements TestConstants {
     @Test
     public void testPropertyChangeListenerOnReloadWhenRollbackBatchException() throws Throwable {
 
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "5");
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+        OwnerProperties props = new OwnerProperties();
+        props.put("someInteger", "5");
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         doNothing().doNothing().doThrow(new RollbackBatchException()).when(propertyChangeListener)
                 .beforePropertyChange(any(PropertyChangeEvent.class));
@@ -115,13 +114,12 @@ public class EventListenerOnReloadTest implements TestConstants {
     @Test
     public void testPropertyChangeListenerOnReloadWhenRollbackOperationException() throws Throwable {
 
-        save(target, new OwnerProperties() {
-            {
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+        OwnerProperties props = new OwnerProperties();
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         PropertyChangeEvent eventToRollback = new PropertyChangeEvent(cfg, "someString", "foobar", "bazbar");
 
@@ -144,14 +142,13 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testPropertyChangeListenerOnReloadWhenChangeHappen() throws Throwable {
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "5");
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+        OwnerProperties props = new OwnerProperties();
+        props.put("someInteger", "5");
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         cfg.reload();
 
@@ -203,14 +200,14 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testReloadListenerIsInvokedOnReload() throws IOException, RollbackBatchException {
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "5");
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+
+        OwnerProperties props = new OwnerProperties();
+        props.put("someInteger", "5");
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         cfg.reload();
 
@@ -228,14 +225,13 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testReloadWhenRollbackBatchExceptionIsThrown() throws Throwable {
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "5");
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+        OwnerProperties props = new OwnerProperties();
+        props.put("someInteger", "5");
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         doThrow(RollbackBatchException.class).when(reloadListener).beforeReload(any(ReloadEvent.class));
 
@@ -249,14 +245,14 @@ public class EventListenerOnReloadTest implements TestConstants {
 
     @Test
     public void testReloadEventIsNotModifiable() throws Throwable {
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "5");
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+
+        OwnerProperties props = new OwnerProperties();
+        props.put("someInteger", "5");
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         final ReloadEvent[] beforeEvent = new ReloadEvent[1];
         final ReloadEvent[] afterEvent = new ReloadEvent[1];
@@ -317,14 +313,13 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         });
 
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "41");
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+        OwnerProperties props = new OwnerProperties();
+        props.put("someInteger", "41");
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         cfg.reload();
 
@@ -336,13 +331,12 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         reloadPerformed[0] = false;
 
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "42");
-                put("someString", "blahblah");
-                put("someDouble", "1.234");
-            }
-        });
+        OwnerProperties otherProps = new OwnerProperties();
+        otherProps.put("someInteger", "42");
+        otherProps.put("someString", "blahblah");
+        otherProps.put("someDouble", "1.234");
+
+        save(target, otherProps);
 
         cfg.reload();
 
@@ -380,14 +374,13 @@ public class EventListenerOnReloadTest implements TestConstants {
             }
         });
 
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "41");
-                put("someString", "bazbar");
-                put("someDouble", "2.718");
-                put("nullsByDefault", "NotNullNow");
-            }
-        });
+        OwnerProperties props = new OwnerProperties();
+        props.put("someInteger", "41");
+        props.put("someString", "bazbar");
+        props.put("someDouble", "2.718");
+        props.put("nullsByDefault", "NotNullNow");
+
+        save(target, props);
 
         cfg.reload();
 
@@ -412,13 +405,12 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         reloadPerformed[0] = false;
 
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "42");
-                put("someString", "blahblah");
-                put("someDouble", "1.234");
-            }
-        });
+        OwnerProperties otherProps = new OwnerProperties();
+        otherProps.put("someInteger", "42");
+        otherProps.put("someString", "blahblah");
+        otherProps.put("someDouble", "1.234");
+
+        save(target, otherProps);
 
         cfg.reload();
 
@@ -430,13 +422,12 @@ public class EventListenerOnReloadTest implements TestConstants {
 
         reloadPerformed[0] = false;
 
-        save(target, new OwnerProperties() {
-            {
-                put("someInteger", "88");
-                put("someString", "this is not rolled back");
-                put("someDouble", "1.2345");
-            }
-        });
+        OwnerProperties thirdProperties = new OwnerProperties();
+        thirdProperties.put("someInteger", "88");
+        thirdProperties.put("someString", "this is not rolled back");
+        thirdProperties.put("someDouble", "1.2345");
+
+        save(target, thirdProperties);
 
         cfg.reload();
 

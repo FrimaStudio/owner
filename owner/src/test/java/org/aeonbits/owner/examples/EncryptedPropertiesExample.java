@@ -22,7 +22,7 @@ public class EncryptedPropertiesExample {
         String scottPassword();
     }
 
-    public static class DecryptConverter implements Converter {
+    public static class DecryptConverter implements Converter<Object> {
         public Object convert(Method method, Object input) {
             String key = System.getProperty("example.encryption.key");
             return new String(xor(Base64.decodeBase64((String) input), key.getBytes()));

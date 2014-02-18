@@ -8,22 +8,22 @@
 
 package org.aeonbits.owner.variableexpansion;
 
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.Config.DisableFeature;
-import org.aeonbits.owner.Config.Sources;
-import org.aeonbits.owner.ConfigFactory;
-import org.junit.Test;
-
 import static org.aeonbits.owner.Config.DisableableFeature.VARIABLE_EXPANSION;
 import static org.aeonbits.owner.util.Collections.map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.DisableFeature;
+import org.aeonbits.owner.Config.Sources;
+import org.aeonbits.owner.ConfigFactory;
+import org.aeonbits.owner.OwnerProperties;
+import org.junit.Test;
+
 /**
  * @author Luigi R. Viggiano
  */
 public class KeyExpansionTest {
-
 
     @Sources("classpath:org/aeonbits/owner/variableexpansion/KeyExpansionExample.xml")
     public interface MyConfig extends Config {
@@ -46,7 +46,7 @@ public class KeyExpansionTest {
 
     @Test
     public void testKeyExpansion() {
-        MyConfig cfg = ConfigFactory.create(MyConfig.class, map("env", "dev"));
+        MyConfig cfg = ConfigFactory.create(MyConfig.class, new OwnerProperties(map("env", "dev")));
 
         assertEquals("DEV", cfg.name());
         assertEquals("devhost", cfg.hostname());
@@ -76,8 +76,8 @@ public class KeyExpansionTest {
 
     @Test
     public void testKeyExpansionDisabled() {
-        MyConfigWithExpansionDisabled cfg =
-                ConfigFactory.create(MyConfigWithExpansionDisabled.class, map("env", "dev"));
+        MyConfigWithExpansionDisabled cfg = ConfigFactory.create(MyConfigWithExpansionDisabled.class,
+                new OwnerProperties(map("env", "dev")));
 
         assertNull(cfg.name());
         assertNull(cfg.hostname());
@@ -122,7 +122,8 @@ public class KeyExpansionTest {
 
     @Test
     public void testKeyExpansionFromAnotherKeyWithImportOverriding() {
-        ExpandsFromAnotherKey cfg = ConfigFactory.create(ExpandsFromAnotherKey.class, map("env", "uat"));
+        ExpandsFromAnotherKey cfg = ConfigFactory.create(ExpandsFromAnotherKey.class,
+                new OwnerProperties(map("env", "uat")));
 
         assertEquals("UAT", cfg.name());
         assertEquals("uathost", cfg.hostname());

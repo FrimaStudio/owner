@@ -26,6 +26,7 @@ import org.aeonbits.owner.Reloadable;
 import org.aeonbits.owner.TestConstants;
 import org.aeonbits.owner.event.ReloadEvent;
 import org.aeonbits.owner.event.ReloadListener;
+import org.aeonbits.owner.util.Collections;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -54,11 +55,7 @@ public class ReloadTest implements TestConstants {
 
     @Before
     public void before() throws Throwable {
-        save(target, new OwnerProperties() {
-            {
-                put("minimumAge", "18");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("minimumAge", "18")));
     }
 
     @Sources(SPEC)
@@ -72,11 +69,7 @@ public class ReloadTest implements TestConstants {
 
         assertEquals(Integer.valueOf(18), cfg.minimumAge());
 
-        save(target, new OwnerProperties() {
-            {
-                put("minimumAge", "21");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("minimumAge", "21")));
 
         cfg.reload();
         assertEquals(Integer.valueOf(21), cfg.minimumAge());
@@ -88,11 +81,7 @@ public class ReloadTest implements TestConstants {
 
     @Test
     public void testReloadWithImportedProperties() throws Throwable {
-        OwnerProperties props = new OwnerProperties() {
-            {
-                put("minimumAge", "18");
-            }
-        };
+        OwnerProperties props = new OwnerProperties(Collections.map("minimumAge", "18"));
 
         ReloadImportConfig cfg = ConfigFactory.create(ReloadImportConfig.class, props);
         assertEquals(Integer.valueOf(18), cfg.minimumAge());

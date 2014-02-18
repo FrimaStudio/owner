@@ -109,13 +109,19 @@ public class AccessibleConfigTest {
     @Test
     public void testGetPropertyWithDefault() throws IOException {
         AccessibleConfig cfg = ConfigFactory.create(AccessibleConfig.class);
-        assertEquals("Good Morning", cfg.getProperty("salutation.text", "Hello"));
+
+        Object value = cfg.getProperty("salutation.text");
+
+        assertEquals("Good Morning", value);
     }
 
     @Test
     public void testGetPropertyWithDefaultThatDoesNotExists() throws IOException {
         AccessibleConfig cfg = ConfigFactory.create(AccessibleConfig.class);
-        assertEquals("Hello", cfg.getProperty("salutation.text.nonexistent", "Hello"));
+
+        Object value = cfg.getProperty("salutation.text.nonexistent", "Hello");
+
+        assertEquals("Hello", value);
     }
 
     @Test

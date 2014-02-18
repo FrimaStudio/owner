@@ -26,6 +26,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.OwnerProperties;
 import org.aeonbits.owner.TestConstants;
 import org.aeonbits.owner.TimeProviderForTest;
+import org.aeonbits.owner.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -68,11 +69,7 @@ public class SyncAutoReloadTest implements TestConstants {
 
     @Test
     public void testAutoReload() throws IOException, InterruptedException {
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "10");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValue", "10")));
         boolean success = target.setLastModified(target.lastModified() - 15000); // make the file 15 seconds older.
         assertTrue(success);
         time.setTime(target.lastModified()); // set the time for this test to match the file creation.
@@ -80,11 +77,8 @@ public class SyncAutoReloadTest implements TestConstants {
         SyncAutoReloadConfig cfg = ConfigFactory.create(SyncAutoReloadConfig.class);
         assertEquals(Integer.valueOf(10), cfg.someValue());
 
-        save(target, new OwnerProperties() {
-            { // file updated, the update time is reflected in target.lastModified().
-                put("someValue", "20");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValue", "20")));
+        // file updated, the update time is reflected in target.lastModified().
 
         time.elapse(4, SECONDS); // make 4 seconds elapse for the test.
         assertEquals(Integer.valueOf(10), cfg.someValue()); // change is not reflected yet since interval is 5 secs.
@@ -101,11 +95,7 @@ public class SyncAutoReloadTest implements TestConstants {
 
     @Test
     public void testAutoReloadOnJarFile() throws Throwable {
-        saveJar(jarTarget, PROPERTY_FILE_NAME, new OwnerProperties() {
-            {
-                put("someValue", "10");
-            }
-        });
+        saveJar(jarTarget, PROPERTY_FILE_NAME, new OwnerProperties(Collections.map("someValue", "10")));
 
         boolean success = jarTarget.setLastModified(jarTarget.lastModified() - 15000); // make the file 15 seconds older
         assertTrue(success);
@@ -115,12 +105,8 @@ public class SyncAutoReloadTest implements TestConstants {
         AutoReloadJarConfig cfg = ConfigFactory.create(AutoReloadJarConfig.class);
         assertEquals(Integer.valueOf(10), cfg.someValue());
 
-        saveJar(jarTarget, PROPERTY_FILE_NAME, // file updated, the update time is reflected in target.lastModified().
-                new OwnerProperties() {
-                    {
-                        put("someValue", "20");
-                    }
-                });
+        saveJar(jarTarget, PROPERTY_FILE_NAME, new OwnerProperties(Collections.map("someValue", "20")));
+        // file updated, the update time is reflected in target.lastModified().
 
         time.elapse(4, SECONDS); // make 4 seconds elapse for the test.
         assertEquals(Integer.valueOf(10), cfg.someValue()); // change is not reflected yet since interval is 5 secs.
@@ -131,11 +117,7 @@ public class SyncAutoReloadTest implements TestConstants {
 
     @Test
     public void testAutoReloadWhenFileGetsDeleted() throws IOException, InterruptedException {
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "10");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValue", "10")));
         boolean success = target.setLastModified(target.lastModified() - 15000); // make the file 15 seconds older.
         assertTrue(success);
         time.setTime(target.lastModified()); // set the time for this test to match the file creation.
@@ -166,11 +148,7 @@ public class SyncAutoReloadTest implements TestConstants {
                 + "SyncAutoReloadTest$SyncAutoReloadConfigFromClasspath.properties");
         classpathTarget.deleteOnExit();
 
-        save(classpathTarget, new OwnerProperties() {
-            {
-                put("someValue", "10");
-            }
-        });
+        save(classpathTarget, new OwnerProperties(Collections.map("someValue", "10")));
 
         boolean success = classpathTarget.setLastModified(classpathTarget.lastModified() - 15000); // make the file 15 seconds older.
         assertTrue(success);
@@ -179,11 +157,8 @@ public class SyncAutoReloadTest implements TestConstants {
         SyncAutoReloadConfigFromClasspath cfg = ConfigFactory.create(SyncAutoReloadConfigFromClasspath.class);
         assertEquals(Integer.valueOf(10), cfg.someValue());
 
-        save(classpathTarget, new OwnerProperties() {
-            { // file updated, the update time is reflected in target.lastModified().
-                put("someValue", "20");
-            }
-        });
+        save(classpathTarget, new OwnerProperties(Collections.map("someValue", "20")));
+        // file updated, the update time is reflected in target.lastModified().
 
         time.elapse(4, SECONDS); // make 4 seconds elapse for the test.
         assertEquals(Integer.valueOf(10), cfg.someValue()); // change is not reflected yet since interval is 5 secs.

@@ -192,8 +192,8 @@ public class ConverterClassTest {
         }
     }
 
-    public static class OverridesIntegerConversion implements Converter {
-        public Object convert(Method method, Object input) {
+    public static class OverridesIntegerConversion implements Converter<Integer> {
+        public Integer convert(Method method, Object input) {
             return 42;
         }
     }

@@ -85,12 +85,12 @@ public class MutableConfigTest {
     @Test
     public void testLoadInputStream() throws IOException {
         File temp = File.createTempFile("MutableConfigTest", ".properties");
-        UtilTest.save(temp, new OwnerProperties() {
-            {
-                put("minAge", "19");
-                put("maxAge", "99");
-            }
-        });
+
+        OwnerProperties props = new OwnerProperties();
+        props.put("minAge", "19");
+        props.put("maxAge", "99");
+
+        UtilTest.save(temp, props);
 
         cfg.load(new FileInputStream(temp));
 
@@ -101,12 +101,12 @@ public class MutableConfigTest {
     @Test
     public void testLoadReader() throws IOException {
         File temp = File.createTempFile("MutableConfigTest", ".properties");
-        UtilTest.save(temp, new OwnerProperties() {
-            {
-                put("minAge", "19");
-                put("maxAge", "99");
-            }
-        });
+
+        OwnerProperties props = new OwnerProperties();
+        props.put("minAge", "19");
+        props.put("maxAge", "99");
+
+        UtilTest.save(temp, props);
 
         cfg.load(new FileReader(temp));
 

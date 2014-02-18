@@ -15,6 +15,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.OwnerProperties;
 import org.aeonbits.owner.SystemProviderForTest;
 import org.aeonbits.owner.UtilTest;
+import org.aeonbits.owner.util.Collections;
 import org.junit.Test;
 
 /**
@@ -40,15 +41,8 @@ public class WithImportedPropertiesTest {
 
     @Test
     public void testSystemEnv() {
-        Object save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties() {
-            {
-                put("user.home", "/home/foobar");
-            }
-        }, new OwnerProperties() {
-            {
-                put("HOME", "/home/foobar");
-            }
-        }));
+        Object save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties(Collections.map("user.home",
+                "/home/foobar")), new OwnerProperties(Collections.map("HOME", "/home/foobar"))));
         try {
             String envHome = (String) UtilTest.getenv("HOME");
             WithImportedProperties conf = ConfigFactory.create(WithImportedProperties.class, UtilTest.getenv());
@@ -60,15 +54,8 @@ public class WithImportedPropertiesTest {
 
     @Test
     public void testMultipleImports() {
-        Object save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties() {
-            {
-                put("user.home", "/home/foobar");
-            }
-        }, new OwnerProperties() {
-            {
-                put("HOME", "/home/foobar");
-            }
-        }));
+        Object save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties(Collections.map("user.home",
+                "/home/foobar")), new OwnerProperties(Collections.map("HOME", "/home/foobar"))));
         try {
             OwnerProperties propsFromTest = new OwnerProperties();
             propsFromTest.put("external", "propsFromTest");

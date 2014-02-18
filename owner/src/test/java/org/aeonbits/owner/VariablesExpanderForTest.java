@@ -8,11 +8,12 @@
 
 package org.aeonbits.owner;
 
-
 /**
  * @author Luigi R. Viggiano
  */
 public class VariablesExpanderForTest extends VariablesExpander {
+    private static final long serialVersionUID = 8075433030141080447L;
+
     public VariablesExpanderForTest(OwnerProperties properties) {
         super(properties);
     }

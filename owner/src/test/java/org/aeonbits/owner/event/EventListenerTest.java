@@ -275,7 +275,7 @@ public class EventListenerTest {
     public void testPartialClearOnRollbackOperationException() throws Throwable {
         Server server = ConfigFactory.create(Server.class);
 
-        doAnswer(new Answer() {
+        doAnswer(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 PropertyChangeEvent evt = (PropertyChangeEvent) invocation.getArguments()[0];
                 if (evt.getPropertyName().equals("port"))

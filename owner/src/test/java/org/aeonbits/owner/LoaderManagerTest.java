@@ -131,6 +131,8 @@ public class LoaderManagerTest implements TestConstants {
     }
 
     public static class LoaderThatDoesNothing implements Loader {
+        private static final long serialVersionUID = 6437342539894352218L;
+
         public boolean accept(URL url) {
             return false;
         }

@@ -9,8 +9,6 @@
 package org.aeonbits.owner;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.aeonbits.owner.Config.DefaultValue;
 import org.aeonbits.owner.Config.Key;
@@ -36,7 +34,7 @@ final class PropertiesMapper {
         return defaultValue != null ? defaultValue.value() : null;
     }
 
-    static void defaults(Map<String, Object> properties, Class<? extends Config> clazz) {
+    static void defaults(OwnerProperties properties, Class<? extends Config> clazz) {
         Method[] methods = clazz.getMethods();
 
         for (Method method : methods) {
@@ -44,27 +42,8 @@ final class PropertiesMapper {
             Object value = defaultValue(method);
 
             if (value != null) {
-                insertRecursive(key, properties, value);
+                properties.put(key, value);
             }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void insertRecursive(String key, Map<String, Object> container, Object value) {
-        if (key.contains(".")) {
-            String base = key.substring(0, key.indexOf("."));
-            String remainder = key.substring(base.length() + 1, key.length() - 1);
-
-            Map<String, Object> current = (Map<String, Object>) container.get(base);
-
-            if (current == null) {
-                current = new HashMap<String, Object>();
-                container.put(base, current);
-            }
-
-            insertRecursive(remainder, current, value);
-        } else {
-            container.put(key, value);
         }
     }
 }

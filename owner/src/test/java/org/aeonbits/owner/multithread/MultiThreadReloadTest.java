@@ -23,6 +23,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.OwnerProperties;
 import org.aeonbits.owner.Reloadable;
 import org.aeonbits.owner.TestConstants;
+import org.aeonbits.owner.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -44,11 +45,7 @@ public class MultiThreadReloadTest extends MultiThreadTestBase implements TestCo
     @Before
     public void before() throws Throwable {
         synchronized (target) {
-            save(target, new OwnerProperties() {
-                {
-                    put("someValue", "10");
-                }
-            });
+            save(target, new OwnerProperties(Collections.map("someValue", "10")));
 
             reloadableConfig = ConfigFactory.create(ReloadableConfig.class);
         }
@@ -103,22 +100,14 @@ public class MultiThreadReloadTest extends MultiThreadTestBase implements TestCo
         @Override
         void execute() throws Throwable {
             synchronized (target) {
-                save(target, new OwnerProperties() {
-                    {
-                        put("someValue", "20");
-                    }
-                });
+                save(target, new OwnerProperties(Collections.map("someValue", "20")));
 
                 cfg.reload();
             }
             yield();
 
             synchronized (target) {
-                save(target, new OwnerProperties() {
-                    {
-                        put("someValue", "10");
-                    }
-                });
+                save(target, new OwnerProperties(Collections.map("someValue", "10")));
 
                 cfg.reload();
             }

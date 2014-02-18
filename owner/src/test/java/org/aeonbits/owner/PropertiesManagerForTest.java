@@ -18,6 +18,8 @@ import org.aeonbits.owner.event.ReloadListener;
  * @author Luigi R. Viggiano
  */
 public class PropertiesManagerForTest extends PropertiesManager {
+    private static final long serialVersionUID = 1758815373972691789L;
+
     public PropertiesManagerForTest(Class<? extends Config> clazz, OwnerProperties properties,
             ScheduledExecutorService scheduler, VariablesExpander expander, LoadersManager loaders,
             OwnerProperties... imports) {

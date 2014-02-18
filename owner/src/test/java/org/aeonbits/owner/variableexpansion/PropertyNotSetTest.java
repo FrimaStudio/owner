@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.OwnerProperties;
+import org.aeonbits.owner.util.Collections;
 import org.junit.Test;
 
 /**
@@ -35,22 +36,14 @@ public class PropertyNotSetTest {
 
     @Test
     public void testPropertySet() {
-        OwnerProperties ctx = new OwnerProperties() {
-            {
-                put("world", "Earth");
-            }
-        };
+        OwnerProperties ctx = new OwnerProperties(Collections.map("world", "Earth"));
         MyConfig cfg = ConfigFactory.create(MyConfig.class, ctx);
         assertEquals("Hello Earth.", cfg.foo());
     }
 
     @Test
     public void testPropertyChanged() {
-        OwnerProperties ctx = new OwnerProperties() {
-            {
-                put("world", "Earth");
-            }
-        };
+        OwnerProperties ctx = new OwnerProperties(Collections.map("world", "Earth"));
         MyConfig cfg = ConfigFactory.create(MyConfig.class, ctx);
 
         ctx.put("world", "Mars");

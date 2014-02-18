@@ -28,6 +28,7 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
 import org.aeonbits.owner.Util.SystemProvider;
+import org.aeonbits.owner.util.Collections;
 import org.junit.Test;
 
 /**
@@ -97,7 +98,7 @@ public class UtilTest {
 
     private static void store(OutputStream out, OwnerProperties p) throws IOException {
         //TODO
-        //p.store(out, "saved for test");
+        p.store(out, "saved for test");
     }
 
     private static boolean isWindows() {
@@ -191,11 +192,8 @@ public class UtilTest {
 
     @Test
     public void testExpandUserHomeOnUnix() {
-        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties() {
-            {
-                put("user.home", "/home/john");
-            }
-        }, new OwnerProperties()));
+        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties(Collections.map(
+                "user.home", "/home/john")), new OwnerProperties()));
 
         try {
             assertEquals("/home/john", Util.expandUserHome("~"));
@@ -213,11 +211,9 @@ public class UtilTest {
 
     @Test
     public void testExpandUserHomeOnWindows() {
-        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties() {
-            {
-                put("user.home", "C:\\Users\\John");
-            }
-        }, new OwnerProperties()));
+        SystemProvider save = UtilTest.setSystem(new SystemProviderForTest(new OwnerProperties(Collections.map(
+                "user.home", "C:\\Users\\John")), new OwnerProperties()));
+
         try {
             assertEquals("C:\\Users\\John", Util.expandUserHome("~"));
             assertEquals("C:\\Users\\John/foo/bar/", Util.expandUserHome("~/foo/bar/"));

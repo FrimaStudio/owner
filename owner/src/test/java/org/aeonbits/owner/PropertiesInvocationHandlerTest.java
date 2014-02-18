@@ -8,11 +8,15 @@
 
 package org.aeonbits.owner;
 
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -46,19 +50,18 @@ public class PropertiesInvocationHandlerTest {
         handler = new PropertiesInvocationHandler(loader);
     }
 
-    /*
-        @Test
-        public void testListPrintStream() throws Throwable {
-            handler.invoke(proxy, MyConfig.class.getDeclaredMethod("list", PrintStream.class), printStream);
-            verify(properties).list(eq(printStream));
-        }
+    @Test
+    public void testListPrintStream() throws Throwable {
+        handler.invoke(proxy, MyConfig.class.getDeclaredMethod("list", PrintStream.class), new Object[] { printStream });
+        verify(properties).list(eq(printStream));
+    }
 
-        @Test
-        public void testListPrintWriter() throws Throwable {
-            handler.invoke(proxy, MyConfig.class.getDeclaredMethod("list", PrintWriter.class), printWriter);
-            verify(properties).list(eq(printWriter));
-        }
-    */
+    @Test
+    public void testListPrintWriter() throws Throwable {
+        handler.invoke(proxy, MyConfig.class.getDeclaredMethod("list", PrintWriter.class), new Object[] { printWriter });
+        verify(properties).list(eq(printWriter));
+    }
+
     public interface MyConfig extends Config, Accessible {
         void list(PrintStream out);
 

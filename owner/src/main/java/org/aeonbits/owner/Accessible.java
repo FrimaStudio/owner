@@ -8,6 +8,10 @@
 
 package org.aeonbits.owner;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Set;
 
 /**
@@ -30,6 +34,42 @@ import java.util.Set;
  * @since 1.0.4
  */
 public interface Accessible extends Config {
+
+    /**
+     * Prints this property list out to the specified output stream. This method is useful for debugging.
+     *
+     * @param out an output stream.
+     * @throws IOException 
+     * @throws ClassCastException if any key in this property list is not a string.
+     * @see java.util.Properties#list(java.io.PrintStream)
+     * @since 1.0.4
+     */
+    void list(PrintStream out) throws IOException;
+
+    /**
+     * Prints this property list out to the specified output stream. This method is useful for debugging.
+     *
+     * @param out an output stream.
+     * @throws ClassCastException if any key in this property list is not a string.
+     * @see java.util.Properties#list(java.io.PrintWriter)
+     * @since 1.0.4
+     */
+    void list(PrintWriter out);
+
+    /**
+     * Stores the underlying properties into an {@link java.io.OutputStream}.
+     * <p>
+     * Notice that method {@link java.util.Properties#store(java.io.Writer, String)} is not implemented since it's not
+     * available in JDK 1.5 (while the target of this library is Java 1.5+).
+     *
+     * @param out      an output stream.
+     * @param comments a description of the property list.
+     * @throws IOException if writing this property list to the specified output stream throws an <tt>IOException</tt>.
+     * @see java.util.Properties#store(java.io.OutputStream, String)
+     * @since 1.0.4
+     */
+    void store(OutputStream out, String comments) throws IOException;
+
     /**
      * Searches for the property with the specified key in this property list.
      * If the key is not found in this property list, the default property list,
@@ -58,5 +98,25 @@ public interface Accessible extends Config {
      */
     Object getProperty(String key, Object defaultValue);
 
+    /**
+     * Returns a set of keys in this property list
+     * including distinct keys in the default property list if a key
+     * of the same name has not already been found from the main
+     * properties list.
+     * <p>
+     * The returned set is not backed by the <tt>Properties</tt> object.
+     * Changes to this <tt>Properties</tt> are not reflected in the set,
+     * or vice versa.
+     *
+     * @return  a set of keys in this property list, including the keys in the
+     *          default property list.
+     * @throws  ClassCastException if any key in this property list
+     *          is not a string.
+     * @see     java.util.Properties#defaults
+     * @see     java.util.Properties#stringPropertyNames()
+     * @see     java.util.Properties#propertyNames()
+     * @since   1.0.5
+     */
     Set<String> propertyNames();
+
 }

@@ -8,14 +8,16 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.loaders.Loader;
-
 import java.net.URL;
+
+import org.aeonbits.owner.loaders.Loader;
 
 /**
  * @author Luigi R. Viggiano
  */
 public class LoadersManagerForTest extends LoadersManager {
+    private static final long serialVersionUID = -7865299822856501920L;
+
     @Override
     public Loader findLoader(URL url) {
         return super.findLoader(url);

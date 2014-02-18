@@ -7,6 +7,11 @@ package org.aeonbits.owner;
 
 import static org.aeonbits.owner.Util.propertiesToMap;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -21,22 +26,38 @@ public class OwnerProperties extends HashMap<String, Object> {
 
     public final static String KEY_SEPARATOR = ".";
 
+    /**
+     * @see HashMap#HashMap()
+     */
     public OwnerProperties() {
         super();
     }
 
+    /**
+     * @see HashMap#HashMap(int)
+     */
     public OwnerProperties(int initialCapacity) {
         super(initialCapacity);
     }
 
+    /**
+     * @see HashMap#HashMap(int, float)
+     */
     public OwnerProperties(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
+    /**
+     * @see HashMap#HashMap(Map<>)
+     */
     public OwnerProperties(Map<? extends String, ? extends Object> m) {
         super(m);
     }
 
+    /**
+     * Creates a new OwnerProperties instance and initializes it with the values stored in the specified Properties object
+     * @param props     The properties to initialize the map with
+     */
     public OwnerProperties(Properties props) {
         this(propertiesToMap(props));
     }
@@ -55,11 +76,39 @@ public class OwnerProperties extends HashMap<String, Object> {
         return null;
     }
 
+    /**
+     * Searches the properties for the specified key.
+     * @param key       The key to search for
+     * @return  The found value, null otherwise
+     */
     public Object get(String key) {
         if (containsKey(key))
             return super.get(key);
 
         return resolve(key, this);
+    }
+
+    /**
+     * @deprecated
+     * @see OwnerProperties#containsKey(String)
+     */
+    @Override
+    @Deprecated
+    public boolean containsKey(Object key) {
+        if (key instanceof String) {
+            return containsKey((String) key);
+        }
+
+        return false;
+    }
+
+    public boolean containsKey(String key) {
+        if (super.containsKey(key)) {
+            return true;
+        }
+
+        //TODO: Fix recursive keys (without breaking resolve and merge methods)
+        return false;
     }
 
     @SuppressWarnings("unchecked")
@@ -134,5 +183,26 @@ public class OwnerProperties extends HashMap<String, Object> {
         }
 
         return prefix + KEY_SEPARATOR + suffix;
+    }
+
+    public void list(PrintStream out) throws IOException {
+        //TODO: Better formatting
+
+        try {
+            byte[] data = super.toString().getBytes("UTF-8");
+
+            out.write(data);
+        } catch (UnsupportedEncodingException e) {
+            //Should never happen...
+        }
+    }
+
+    public void list(PrintWriter out) {
+        //TODO: Better formatting
+        out.write(super.toString());
+    }
+
+    public void store(OutputStream out, String comments) throws IOException {
+        //TODO
     }
 }

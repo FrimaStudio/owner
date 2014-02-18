@@ -20,6 +20,7 @@ import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.OwnerProperties;
 import org.aeonbits.owner.TestConstants;
+import org.aeonbits.owner.util.Collections;
 import org.junit.Test;
 
 /**
@@ -74,17 +75,16 @@ public class ImportConfigTest implements TestConstants {
     public void testThatImportedPropertiesHaveHigherPriorityThanPropertiesLoadedBySources() throws IOException {
         File target = fileFromURL(SPEC);
 
-        save(target, new OwnerProperties() {
-            {
-                put("foo", "strawberries");
-            }
-        });
+        OwnerProperties props = new OwnerProperties();
+        props.put("foo", "strawberries");
+
+        save(target, props);
 
         try {
-            OwnerProperties props = new OwnerProperties();
-            props.put("foo", "pineapple");
-            props.put("bar", "lime");
-            ImportConfig cfg = ConfigFactory.create(ImportConfig.class, props); // props imported!
+            OwnerProperties otherProps = new OwnerProperties();
+            otherProps.put("foo", "pineapple");
+            otherProps.put("bar", "lime");
+            ImportConfig cfg = ConfigFactory.create(ImportConfig.class, otherProps); // props imported!
             assertEquals("pineapple", cfg.foo());
             assertEquals("lime", cfg.bar());
             assertEquals("orange", cfg.baz());
@@ -103,19 +103,8 @@ public class ImportConfigTest implements TestConstants {
         assertEquals(Integer.valueOf(18), cfg.minAge());
 
         ImportedPropertiesHaveHigherPriority cfg2 = ConfigFactory.create(ImportedPropertiesHaveHigherPriority.class,
-                new OwnerProperties() {
-                    {
-                        put("minAge", "21");
-                    }
-                },
-
-                new OwnerProperties() {
-                    {
-                        put("minAge", "22");
-                    }
-                }
-
-        );
+                new OwnerProperties(Collections.map("minAge", "21")),
+                new OwnerProperties(Collections.map("minAge", "22")));
 
         assertEquals(Integer.valueOf(21), cfg2.minAge());
     }

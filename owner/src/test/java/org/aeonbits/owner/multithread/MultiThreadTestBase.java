@@ -8,23 +8,23 @@
 
 package org.aeonbits.owner.multithread;
 
-import org.aeonbits.owner.Config;
-
 import java.lang.Thread.State;
 import java.util.List;
+
+import org.aeonbits.owner.Config;
 
 /**
  * @author Luigi R. Viggiano
  */
 abstract class MultiThreadTestBase {
-    void join(ThreadBase[]... args) throws InterruptedException {
-        for (ThreadBase[] threads : args)
+    void join(ThreadBase<?>[]... args) throws InterruptedException {
+        for (ThreadBase<?>[] threads : args)
             for (Thread thread : threads)
                 thread.join();
     }
 
-    void start(ThreadBase[]... args) throws InterruptedException {
-        for (ThreadBase[] threads : args)
+    void start(ThreadBase<?>[]... args) throws InterruptedException {
+        for (ThreadBase<?>[] threads : args)
             for (Thread thread : threads) {
                 thread.start();
                 while (thread.getState() != State.WAITING)
@@ -41,13 +41,13 @@ abstract class MultiThreadTestBase {
             int errorCount = thread.errors.size();
 
             if (errorCount > 0)
-                System.err.printf("There are %d exception collected by %s#%d\n", errorCount,
-                        thread.getClass().getName(), i);
+                System.err.printf("There are %d exception collected by %s#%d\n", errorCount, thread.getClass()
+                        .getName(), i);
 
             List<Throwable> errors = thread.errors;
             for (Throwable error : errors) {
-                System.err.printf("%s#%d thrown an exception: %s\n", thread.getClass().getName(), i,
-                        error.getMessage());
+                System.err
+                        .printf("%s#%d thrown an exception: %s\n", thread.getClass().getName(), i, error.getMessage());
                 error.printStackTrace(System.err);
                 throw error;
             }

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.aeonbits.owner.Config.Sources;
+import org.aeonbits.owner.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,11 +38,8 @@ public class ConfigFactoryTest implements TestConstants {
     @Before
     public void before() throws IOException {
         ConfigFactory.setProperties(null);
-        save(new File(RESOURCES_DIR + "/myconfig.properties"), new OwnerProperties() {
-            {
-                put("someValue", "foobar");
-            }
-        });
+        save(new File(RESOURCES_DIR + "/myconfig.properties"),
+                new OwnerProperties(Collections.map("someValue", "foobar")));
     }
 
     @Test
@@ -81,11 +79,7 @@ public class ConfigFactoryTest implements TestConstants {
 
     @Test
     public void testSetProperties() {
-        ConfigFactory.setProperties(new OwnerProperties() {
-            {
-                put("mypath", RESOURCES_DIR);
-            }
-        });
+        ConfigFactory.setProperties(new OwnerProperties(Collections.map("mypath", RESOURCES_DIR)));
 
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
 
@@ -147,7 +141,9 @@ public class ConfigFactoryTest implements TestConstants {
 
         MyConfigWithoutProtocol cfg = ConfigFactory.create(MyConfigWithoutProtocol.class);
 
-        assertEquals("foobar", cfg.someValue());
+        Object value = cfg.someValue();
+
+        assertEquals("foobar", value);
     }
 
     @Test

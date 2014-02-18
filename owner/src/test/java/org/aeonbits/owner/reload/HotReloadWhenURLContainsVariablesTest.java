@@ -25,6 +25,7 @@ import org.aeonbits.owner.TestConstants;
 import org.aeonbits.owner.VariablesExpanderForTest;
 import org.aeonbits.owner.event.ReloadEvent;
 import org.aeonbits.owner.event.ReloadListener;
+import org.aeonbits.owner.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,11 +51,7 @@ public class HotReloadWhenURLContainsVariablesTest extends AsyncReloadSupport im
         String spec = new VariablesExpanderForTest(new OwnerProperties()).expand(SPEC);
 
         target = fileFromURL(spec);
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "10");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValue", "10")));
 
         // 1-Jan-1970 (so, the file it's old enough to need reload
         target.setLastModified(0);
@@ -72,11 +69,7 @@ public class HotReloadWhenURLContainsVariablesTest extends AsyncReloadSupport im
 
         assertEquals(new Integer(10), cfg.someValue());
 
-        save(target, new OwnerProperties() {
-            {
-                put("someValue", "20");
-            }
-        });
+        save(target, new OwnerProperties(Collections.map("someValue", "20")));
 
         waitForReload(1000);
 

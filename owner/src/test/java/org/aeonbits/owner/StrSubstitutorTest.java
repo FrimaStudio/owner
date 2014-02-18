@@ -81,12 +81,10 @@ public class StrSubstitutorTest {
 
     @Test
     public void testMissingPropertyIsReplacedWithEmptyString() {
-        OwnerProperties values = new OwnerProperties() {
-            {
-                put("foo", "fooValue");
-                put("baz", "bazValue");
-            }
-        };
+        OwnerProperties values = new OwnerProperties();
+        values.put("foo", "fooValue");
+        values.put("baz", "bazValue");
+
         String template = "Test: ${foo} ${bar} ${baz} :Test";
         String expected = "Test: fooValue  bazValue :Test";
         String result = new StrSubstitutor(values).replace(template);

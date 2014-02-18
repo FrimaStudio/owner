@@ -11,16 +11,9 @@ package org.aeonbits.owner.interfaces;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.ConfigFactory;
 import org.aeonbits.owner.Mutable;
-import org.aeonbits.owner.OwnerProperties;
-import org.aeonbits.owner.UtilTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -80,37 +73,5 @@ public class MutableConfigTest {
         assertEquals(Integer.valueOf(18), cfg.minAge());
         cfg.clear();
         assertNull(cfg.minAge());
-    }
-
-    @Test
-    public void testLoadInputStream() throws IOException {
-        File temp = File.createTempFile("MutableConfigTest", ".properties");
-
-        OwnerProperties props = new OwnerProperties();
-        props.put("minAge", "19");
-        props.put("maxAge", "99");
-
-        UtilTest.save(temp, props);
-
-        cfg.load(new FileInputStream(temp));
-
-        assertEquals(Integer.valueOf(19), cfg.minAge());
-        assertEquals(Integer.valueOf(99), cfg.maxAge());
-    }
-
-    @Test
-    public void testLoadReader() throws IOException {
-        File temp = File.createTempFile("MutableConfigTest", ".properties");
-
-        OwnerProperties props = new OwnerProperties();
-        props.put("minAge", "19");
-        props.put("maxAge", "99");
-
-        UtilTest.save(temp, props);
-
-        cfg.load(new FileReader(temp));
-
-        assertEquals(Integer.valueOf(19), cfg.minAge());
-        assertEquals(Integer.valueOf(99), cfg.maxAge());
     }
 }

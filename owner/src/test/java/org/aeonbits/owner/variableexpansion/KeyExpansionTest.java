@@ -13,6 +13,7 @@ import static org.aeonbits.owner.util.Collections.map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.aeonbits.owner.Accessible;
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.DisableFeature;
 import org.aeonbits.owner.Config.Sources;
@@ -25,8 +26,8 @@ import org.junit.Test;
  */
 public class KeyExpansionTest {
 
-    @Sources("classpath:org/aeonbits/owner/variableexpansion/KeyExpansionExample.xml")
-    public interface MyConfig extends Config {
+    @Sources("classpath:org/aeonbits/owner/variableexpansion/KeyExpansionExample.yaml")
+    public interface MyConfig extends Config, Accessible {
         @Key("servers.${env}.name")
         String name();
 
@@ -56,7 +57,7 @@ public class KeyExpansionTest {
     }
 
     @DisableFeature(VARIABLE_EXPANSION)
-    @Sources("classpath:org/aeonbits/owner/variableexpansion/KeyExpansionExample.xml")
+    @Sources("classpath:org/aeonbits/owner/variableexpansion/KeyExpansionExample.yaml")
     public interface MyConfigWithExpansionDisabled extends Config {
         @Key("servers.${env}.name")
         String name();
@@ -86,7 +87,7 @@ public class KeyExpansionTest {
         assertNull(cfg.password());
     }
 
-    @Sources("classpath:org/aeonbits/owner/variableexpansion/KeyExpansionExample.xml")
+    @Sources("classpath:org/aeonbits/owner/variableexpansion/KeyExpansionExample.yaml")
     public interface ExpandsFromAnotherKey extends Config {
 
         @DefaultValue("dev")

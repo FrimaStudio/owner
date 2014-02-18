@@ -9,7 +9,6 @@
 package org.aeonbits.owner;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -55,20 +54,6 @@ public interface Accessible extends Config {
      * @since 1.0.4
      */
     void list(PrintWriter out);
-
-    /**
-     * Stores the underlying properties into an {@link java.io.OutputStream}.
-     * <p>
-     * Notice that method {@link java.util.Properties#store(java.io.Writer, String)} is not implemented since it's not
-     * available in JDK 1.5 (while the target of this library is Java 1.5+).
-     *
-     * @param out      an output stream.
-     * @param comments a description of the property list.
-     * @throws IOException if writing this property list to the specified output stream throws an <tt>IOException</tt>.
-     * @see java.util.Properties#store(java.io.OutputStream, String)
-     * @since 1.0.4
-     */
-    void store(OutputStream out, String comments) throws IOException;
 
     /**
      * Searches for the property with the specified key in this property list.

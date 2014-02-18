@@ -27,8 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.beans.PropertyChangeEvent;
-import java.io.ByteArrayInputStream;
-import java.io.StringReader;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.aeonbits.owner.ConfigFactory;
@@ -250,28 +248,6 @@ public class EventListenerTest {
     }
 
     @Test
-    public void testLoadInputStream() throws Throwable {
-        Server server = ConfigFactory.create(Server.class);
-        server.addPropertyChangeListener(propertyChangeListener);
-        String properties = getPropertiesTextForLoad();
-        server.load(new ByteArrayInputStream(properties.getBytes()));
-        verifyLoad(server);
-    }
-
-    @Test
-    public void testLoadReader() throws Throwable {
-        Server server = ConfigFactory.create(Server.class);
-        server.addPropertyChangeListener(propertyChangeListener);
-        String properties = getPropertiesTextForLoad();
-        server.load(new StringReader(properties));
-        verifyLoad(server);
-    }
-
-    private String getPropertiesTextForLoad() {
-        return "hostname = foobar\n" + "port = 80\n" + "protocol = http\n";
-    }
-
-    @Test
     public void testPartialClearOnRollbackOperationException() throws Throwable {
         Server server = ConfigFactory.create(Server.class);
 
@@ -308,66 +284,6 @@ public class EventListenerTest {
         inOrder.verify(propertyChangeListener, times(1)).beforePropertyChange(argThat(matches(protocolChangeEvent)));
         inOrder.verify(propertyChangeListener, times(1)).propertyChange(argThat(matches(protocolChangeEvent)));
 
-    }
-
-    @Test
-    public void testLoadReaderOnRollbackBatchException() throws Throwable {
-        Server server = prepareLoadForRollbackBatch();
-        String properties = getPropertiesAsText();
-        server.load(new StringReader(properties));
-        verifyLoadIsRolledBackCompletely(server);
-    }
-
-    @Test
-    public void testLoadInputStreamOnRollbackBatchException() throws Throwable {
-        Server server = prepareLoadForRollbackBatch();
-        String properties = getPropertiesAsText();
-        server.load(new ByteArrayInputStream(properties.getBytes()));
-        verifyLoadIsRolledBackCompletely(server);
-    }
-
-    private void verifyLoadIsRolledBackCompletely(Server server) throws RollbackBatchException,
-            RollbackOperationException {
-        assertEquals("localhost", server.hostname());
-        assertEquals(8080, server.port());
-        assertEquals("http", server.protocol());
-        verify(propertyChangeListener, times(3)).beforePropertyChange(any(PropertyChangeEvent.class));
-        verify(propertyChangeListener, never()).propertyChange(any(PropertyChangeEvent.class));
-    }
-
-    private String getPropertiesAsText() {
-        return "hostname = foobar\n" + "port = 80\n" + "protocol = ftp\n";
-    }
-
-    private Server prepareLoadForRollbackBatch() throws RollbackOperationException, RollbackBatchException {
-        Server server = ConfigFactory.create(Server.class);
-        server.addPropertyChangeListener(propertyChangeListener);
-
-        doNothing().doNothing().doThrow(new RollbackBatchException()).when(propertyChangeListener)
-                .beforePropertyChange(any(PropertyChangeEvent.class));
-        return server;
-    }
-
-    private void verifyLoad(Server server) throws RollbackOperationException, RollbackBatchException {
-        assertEquals("foobar", server.hostname());
-        assertEquals(80, server.port());
-        assertEquals("http", server.protocol());
-
-        PropertyChangeEvent hostnameChangeEvent = new PropertyChangeEvent(server, "hostname", "localhost", "foobar");
-        PropertyChangeEvent portChangeEvent = new PropertyChangeEvent(server, "port", "8080", "80");
-
-        verify(propertyChangeListener, times(1)).beforePropertyChange(argThat(matches(hostnameChangeEvent)));
-        verify(propertyChangeListener, times(1)).beforePropertyChange(argThat(matches(portChangeEvent)));
-        verify(propertyChangeListener, times(1)).propertyChange(argThat(matches(hostnameChangeEvent)));
-        verify(propertyChangeListener, times(1)).propertyChange(argThat(matches(portChangeEvent)));
-
-        InOrder inOrder = inOrder(propertyChangeListener);
-        inOrder.verify(propertyChangeListener, times(1)).beforePropertyChange(argThat(matches(hostnameChangeEvent)));
-        inOrder.verify(propertyChangeListener, times(1)).propertyChange(argThat(matches(hostnameChangeEvent)));
-
-        inOrder = inOrder(propertyChangeListener);
-        inOrder.verify(propertyChangeListener, times(1)).beforePropertyChange(argThat(matches(portChangeEvent)));
-        inOrder.verify(propertyChangeListener, times(1)).propertyChange(argThat(matches(portChangeEvent)));
     }
 
     @Test

@@ -8,12 +8,7 @@
 
 package org.aeonbits.owner.importedprops;
 
-import static org.aeonbits.owner.UtilTest.fileFromURL;
-import static org.aeonbits.owner.UtilTest.save;
 import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.io.IOException;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.Sources;
@@ -69,28 +64,6 @@ public class ImportConfigTest implements TestConstants {
         assertEquals("pineapple", cfg.foo());
         assertEquals("lime", cfg.bar()); // p1 prevails, so this is lime and not grapefruit
         assertEquals("blackberry", cfg.baz());
-    }
-
-    @Test
-    public void testThatImportedPropertiesHaveHigherPriorityThanPropertiesLoadedBySources() throws IOException {
-        File target = fileFromURL(SPEC);
-
-        OwnerProperties props = new OwnerProperties();
-        props.put("foo", "strawberries");
-
-        save(target, props);
-
-        try {
-            OwnerProperties otherProps = new OwnerProperties();
-            otherProps.put("foo", "pineapple");
-            otherProps.put("bar", "lime");
-            ImportConfig cfg = ConfigFactory.create(ImportConfig.class, otherProps); // props imported!
-            assertEquals("pineapple", cfg.foo());
-            assertEquals("lime", cfg.bar());
-            assertEquals("orange", cfg.baz());
-        } finally {
-            target.delete();
-        }
     }
 
     interface ImportedPropertiesHaveHigherPriority extends Config {

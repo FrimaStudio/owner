@@ -8,18 +8,12 @@
 
 package org.aeonbits.owner;
 
-import static org.aeonbits.owner.UtilTest.save;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.aeonbits.owner.Config.Sources;
-import org.aeonbits.owner.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,22 +27,14 @@ public class ConfigFactoryTest implements TestConstants {
     interface MyConfig extends Config {
         @DefaultValue("defaultValue")
         String someValue();
+
+        @DefaultValue("${setMe}")
+        String someOtherValue();
     }
 
     @Before
     public void before() throws IOException {
         ConfigFactory.setProperties(null);
-        save(new File(RESOURCES_DIR + "/myconfig.properties"),
-                new OwnerProperties(Collections.map("someValue", "foobar")));
-    }
-
-    @Test
-    public void testSetProperty() {
-        ConfigFactory.setProperty("mypath", RESOURCES_DIR);
-
-        MyConfig cfg = ConfigFactory.create(MyConfig.class);
-
-        assertEquals("foobar", cfg.someValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -66,24 +52,6 @@ public class ConfigFactoryTest implements TestConstants {
         assertNull(ConfigFactory.setProperty("mypath", RESOURCES_DIR));
         assertEquals(RESOURCES_DIR, ConfigFactory.setProperty("mypath", RESOURCES_DIR + "-2"));
         assertEquals(RESOURCES_DIR + "-2", ConfigFactory.getProperty("mypath"));
-    }
-
-    @Test
-    public void testGetProperties() {
-        ConfigFactory.getProperties().put("mypath", RESOURCES_DIR);
-
-        MyConfig cfg = ConfigFactory.create(MyConfig.class);
-
-        assertEquals("foobar", cfg.someValue());
-    }
-
-    @Test
-    public void testSetProperties() {
-        ConfigFactory.setProperties(new OwnerProperties(Collections.map("mypath", RESOURCES_DIR)));
-
-        MyConfig cfg = ConfigFactory.create(MyConfig.class);
-
-        assertEquals("foobar", cfg.someValue());
     }
 
     @Test
@@ -126,36 +94,6 @@ public class ConfigFactoryTest implements TestConstants {
     @Test(expected = IllegalArgumentException.class)
     public void testClearPropertyEmptyKey() {
         ConfigFactory.clearProperty("");
-    }
-
-    @Sources("${myurl}")
-    interface MyConfigWithoutProtocol extends Config, Accessible {
-        @DefaultValue("defaultValue")
-        String someValue();
-    }
-
-    @Test
-    public void testSetPropertyWithoutProtocol() {
-        ConfigFactory.setProperty("mypath", RESOURCES_DIR);
-        ConfigFactory.setProperty("myurl", "file:${mypath}/myconfig.properties");
-
-        MyConfigWithoutProtocol cfg = ConfigFactory.create(MyConfigWithoutProtocol.class);
-
-        Object value = cfg.someValue();
-
-        assertEquals("foobar", value);
-    }
-
-    @Test
-    public void testSetPropertyWithoutProtocolWhenFileIsNotFound() {
-        ConfigFactory.setProperty("mypath", RESOURCES_DIR);
-        ConfigFactory.setProperty("myurl", "file:${mypath}/non-existent.properties");
-
-        MyConfigWithoutProtocol cfg = ConfigFactory.create(MyConfigWithoutProtocol.class);
-
-        assertEquals("defaultValue", cfg.someValue());
-        assertThat(cfg.propertyNames(), contains("someValue"));
-        assertThat(cfg.propertyNames().size(), is(1));
     }
 
     @After

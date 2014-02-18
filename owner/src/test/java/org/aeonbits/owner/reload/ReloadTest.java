@@ -9,7 +9,6 @@
 package org.aeonbits.owner.reload;
 
 import static org.aeonbits.owner.UtilTest.fileFromURL;
-import static org.aeonbits.owner.UtilTest.save;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.times;
@@ -31,7 +30,6 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,26 +51,9 @@ public class ReloadTest implements TestConstants {
         target = fileFromURL(SPEC);
     }
 
-    @Before
-    public void before() throws Throwable {
-        save(target, new OwnerProperties(Collections.map("minimumAge", "18")));
-    }
-
     @Sources(SPEC)
     public interface ReloadableConfig extends Config, Reloadable {
         Integer minimumAge();
-    }
-
-    @Test
-    public void testReload() throws Throwable {
-        ReloadableConfig cfg = ConfigFactory.create(ReloadableConfig.class);
-
-        assertEquals(Integer.valueOf(18), cfg.minimumAge());
-
-        save(target, new OwnerProperties(Collections.map("minimumAge", "21")));
-
-        cfg.reload();
-        assertEquals(Integer.valueOf(21), cfg.minimumAge());
     }
 
     public interface ReloadImportConfig extends Config, Reloadable {

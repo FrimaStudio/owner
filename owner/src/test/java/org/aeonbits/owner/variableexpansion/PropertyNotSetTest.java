@@ -31,7 +31,8 @@ public class PropertyNotSetTest {
     @Test
     public void testPropertyNotSet() {
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
-        assertEquals("Hello .", cfg.foo());
+        Object value = cfg.foo();
+        assertEquals("Hello .", value);
     }
 
     @Test

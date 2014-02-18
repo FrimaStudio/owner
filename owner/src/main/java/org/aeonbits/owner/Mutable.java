@@ -9,9 +9,6 @@
 package org.aeonbits.owner;
 
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 
 /**
  * <p>Allows a <tt>Config</tt> object to change its property values at runtime.</p> <p/> <p>Example:</p>
@@ -65,28 +62,6 @@ public interface Mutable extends Config {
      * @since 1.0.4
      */
     void clear();
-
-    /**
-     * Reads a property list (key and element pairs) from the input byte stream.
-     *
-     * @param inStream the input stream.
-     * @throws java.io.IOException      if an error occurred when reading from the input stream.
-     * @throws IllegalArgumentException if the input stream contains a malformed Unicode escape sequence.
-     * @see java.util.Properties#load(java.io.InputStream)
-     * @since 1.0.4
-     */
-    void load(InputStream inStream) throws IOException;
-
-    /**
-     * Reads a property list (key and element pairs) from the input character stream in a simple line-oriented format.
-     *
-     * @param reader the input character stream.
-     * @throws IOException              if an error occurred when reading from the input stream.
-     * @throws IllegalArgumentException if a malformed Unicode escape appears in the input.
-     * @see java.util.Properties#load(java.io.Reader)
-     * @since 1.0.4
-     */
-    void load(Reader reader) throws IOException;
 
     /**
      * Adds a {@link PropertyChangeListener} to the Mutable interface.

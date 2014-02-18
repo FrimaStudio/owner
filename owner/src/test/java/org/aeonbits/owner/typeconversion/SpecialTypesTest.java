@@ -8,17 +8,17 @@
 
 package org.aeonbits.owner.typeconversion;
 
-import org.aeonbits.owner.Config;
-import org.aeonbits.owner.ConfigFactory;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.net.URL;
 import java.sql.Driver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.ConfigFactory;
+import org.junit.Test;
 
 /**
  * @author Luigi R. Viggiano
@@ -35,7 +35,7 @@ public class SpecialTypesTest {
             this.text = text;
         }
 
-        public InvalidValueOf valueOf(String text) {
+        public InvalidValueOf valueOf(String input) {
             return new InvalidValueOf(text);
         }
     }

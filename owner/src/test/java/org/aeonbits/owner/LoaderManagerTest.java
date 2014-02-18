@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.aeonbits.owner.Config.Sources;
 import org.aeonbits.owner.loaders.Loader;
 import org.aeonbits.owner.loaders.PropertiesLoader;
+import org.aeonbits.owner.loaders.YAMLLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +64,7 @@ public class LoaderManagerTest implements TestConstants {
                 loadersManager.clear();
             }
         };
-        factory.registerLoader(new PropertiesLoader());
+        factory.registerLoader(new YAMLLoader());
         factory.create(MyConfig.class);
     }
 

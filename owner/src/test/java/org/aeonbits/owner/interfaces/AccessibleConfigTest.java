@@ -13,11 +13,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -83,15 +80,6 @@ public class AccessibleConfigTest {
         config.list(new PrintWriter(result, true));
 
         assertEquals(expected.toString(), result.toString());
-    }
-
-    @Test
-    public void testStore() throws IOException {
-        AccessibleConfig cfg = ConfigFactory.create(AccessibleConfig.class);
-        File tmp = File.createTempFile("owner-", ".tmp");
-        cfg.store(new FileOutputStream(tmp), "no comments");
-        assertTrue(tmp.exists());
-        assertTrue(tmp.length() > 0);
     }
 
     @Test

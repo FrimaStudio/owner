@@ -38,6 +38,17 @@ import org.aeonbits.owner.Config.ConverterClass;
  */
 enum Converters {
 
+    NO_CONVERSION_REQUIRED {
+        @Override
+        Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
+            if (value != null && value.getClass().equals(targetType)) {
+                return value;
+            }
+
+            return null;
+        }
+    },
+
     ARRAY {
         @Override
         Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
@@ -227,7 +238,7 @@ enum Converters {
         @Override
         Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
             try {
-                Method method = targetType.getMethod("valueOf", String.class);
+                Method method = targetType.getMethod("valueOf", value.getClass());
                 if (isStatic(method.getModifiers()))
                     return method.invoke(null, value);
                 return null;

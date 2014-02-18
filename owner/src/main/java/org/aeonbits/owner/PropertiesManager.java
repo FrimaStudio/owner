@@ -22,7 +22,6 @@ import static org.aeonbits.owner.Util.unsupported;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -358,16 +357,6 @@ class PropertiesManager implements Reloadable, Accessible {
         readLock.lock();
         try {
             properties.list(out);
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-    @Delegate
-    public void store(OutputStream out, String comments) throws IOException {
-        readLock.lock();
-        try {
-            properties.store(out, comments);
         } finally {
             readLock.unlock();
         }

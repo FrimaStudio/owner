@@ -8,7 +8,6 @@ package org.aeonbits.owner;
 import static org.aeonbits.owner.Util.propertiesToMap;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -200,9 +199,5 @@ public class OwnerProperties extends HashMap<String, Object> {
     public void list(PrintWriter out) {
         //TODO: Better formatting
         out.write(super.toString());
-    }
-
-    public void store(OutputStream out, String comments) throws IOException {
-        //TODO
     }
 }

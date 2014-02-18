@@ -1,0 +1,13 @@
+servers:
+  dev:
+    name: "DEV"
+    hostname: "devhost"
+    port: 6000
+    user: "myuser1"
+    password: "mypass1"
+  uat:
+    name: "UAT"
+    hostname: "uathost"
+    port: 60020
+    user: "myuser2"
+    password: "mypass2"

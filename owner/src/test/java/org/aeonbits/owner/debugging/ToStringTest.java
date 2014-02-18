@@ -8,11 +8,11 @@
 
 package org.aeonbits.owner.debugging;
 
+import static org.junit.Assert.assertEquals;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.ConfigFactory;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Luigi R. Viggiano
@@ -36,6 +36,7 @@ public class ToStringTest {
     @Test
     public void toStringTest() {
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
-        assertEquals("{default.name=untitled, max.folders=99, max.threads=25}", cfg.toString());
+
+        assertEquals("{max.threads=25, default.name=untitled, max.folders=99}", cfg.toString());
     }
 }

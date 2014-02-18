@@ -115,7 +115,7 @@ public class CollectionSupportTest {
 
     @Test
     public void itShouldWorkWithRawCollectionAsWithCollectionOfStrings() throws Exception {
-        assertEquals(Arrays.asList("1", "2", "3"), cfg.rawCollection());
+        assertEquals(Arrays.asList(1, 2, 3), cfg.rawCollection());
     }
 
 }

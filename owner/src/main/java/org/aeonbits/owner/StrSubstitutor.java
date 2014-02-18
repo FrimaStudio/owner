@@ -76,10 +76,12 @@ class StrSubstitutor implements Serializable {
 
             if (value instanceof String) {
                 String text = (String) value;
-                String replacement = (text != null) ? replace(text) : "";
+                String replacement = replace(text);
                 m.appendReplacement(sb, fixBackslashForRegex(replacement));
             } else if (value != null) {
                 m.appendReplacement(sb, value.toString());
+            } else {
+                m.appendReplacement(sb, "");
             }
         }
         m.appendTail(sb);

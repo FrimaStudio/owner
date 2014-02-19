@@ -1,0 +1,12 @@
+# -*- mode: YAML; tab-width: 2; fill-column: 80; -*-
+foo:
+  bar: 1234
+  
+servers:
+  - host: firstserver.com
+    port: 1234
+  - host: secondserver.com
+    port: 4321
+  
+expansion:
+  expandBy: "amet"

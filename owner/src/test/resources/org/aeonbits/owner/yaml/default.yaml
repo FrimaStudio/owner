@@ -1,0 +1,12 @@
+# -*- mode: YAML; tab-width: 2; fill-column: 80; -*-
+foo:
+  bar: 0
+  baz: "something"
+  
+servers:
+  - host: google.com
+    port: 1234
+  
+expansion:
+  expandBy: "" # Value is set in 'live.yaml'
+  toExpand: "Lorem ipsum dolor sit ${expansion.expandBy}"

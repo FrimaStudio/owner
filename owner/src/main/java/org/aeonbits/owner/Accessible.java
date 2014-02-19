@@ -26,7 +26,7 @@ import java.util.Set;
  *         cfg.list(System.out);
  *     }
  * </pre>
- * <p>These methods will print the list of properties, see {@link java.util.Map#toString()}.</p>
+ * <p>These methods will print the list of properties, see {@link java.util.HashMap#toString()}.</p>
  *
  * @author Luigi R. Viggiano
  * @since 1.0.4
@@ -39,7 +39,7 @@ public interface Accessible extends Config {
      * @param out an output stream.
      * @throws IOException 
      * @throws ClassCastException if any key in this property list is not a string.
-     * @see java.util.Map#toString()
+     * @see java.util.HashMap#toString()
      * @since 1.0.4
      */
     void list(PrintStream out) throws IOException;
@@ -49,7 +49,7 @@ public interface Accessible extends Config {
      *
      * @param out an output stream.
      * @throws ClassCastException if any key in this property list is not a string.
-     * @see java.util.Map#toString()
+     * @see java.util.HashMap#toString()
      * @since 1.0.4
      */
     void list(PrintWriter out);

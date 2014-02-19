@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * <p>
- * Container for loaded properties. This is only a simple wrapper around an {@link HashMap<String, Object>} that allows pretty
+ * Container for loaded properties. This is only a simple wrapper around an {@link HashMap} that allows pretty
  * much any type of configuration (from a '.properties' file to JSON, XML and YAML) that can be stored as a HashMap<String, ? extends Object>
  * to be stored and accessed.
  * </p>

@@ -45,7 +45,7 @@ public interface Reloadable extends Config {
 
     /**
      * Reloads the properties using the same logic as when the object was instantiated by {@link
-     * ConfigFactory#create(Class, java.util.Map[])}.
+     * ConfigFactory#create(Class, OwnerProperties[])}.
      *
      * @since 1.0.4
      */

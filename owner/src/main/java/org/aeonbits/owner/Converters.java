@@ -266,7 +266,7 @@ enum Converters {
     CLASS_WITH_VALUE_OF_METHOD_REVERSE {
         @Override
         Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
-            if (value == null)
+            if (value == null || targetType == Object.class)
                 return null;
 
             try {

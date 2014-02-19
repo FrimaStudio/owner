@@ -219,6 +219,21 @@ enum Converters {
         }
     },
 
+    CLASS_WITH_VALUE_TYPE_CONSTRUCTOR {
+        @Override
+        Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
+            if (value == null)
+                return null;
+
+            try {
+                Constructor<?> constructor = targetType.getConstructor(value.getClass());
+                return constructor.newInstance(value);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    },
+
     CLASS_WITH_STRING_CONSTRUCTOR {
         @Override
         Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
@@ -239,6 +254,24 @@ enum Converters {
         Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
             try {
                 Method method = targetType.getMethod("valueOf", value.getClass());
+                if (isStatic(method.getModifiers()))
+                    return method.invoke(null, value);
+                return null;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    },
+
+    CLASS_WITH_VALUE_OF_METHOD_REVERSE {
+        @Override
+        Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
+            if (value == null)
+                return null;
+
+            try {
+                Class<?> valueType = value.getClass();
+                Method method = valueType.getMethod("valueOf", targetType);
                 if (isStatic(method.getModifiers()))
                     return method.invoke(null, value);
                 return null;
@@ -283,7 +316,8 @@ enum Converters {
     }
 
     private static UnsupportedOperationException unsupportedConversion(Class<?> targetType, Object value) {
-        return unsupported("Cannot convert '%s' to %s", value, targetType.getCanonicalName());
+        return unsupported("Cannot convert '%s' from type '%s' to '%s'", value, value.getClass().getCanonicalName(),
+                targetType.getCanonicalName());
     }
 
     private static class ConversionResult {

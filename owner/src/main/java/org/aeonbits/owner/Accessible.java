@@ -26,8 +26,7 @@ import java.util.Set;
  *         cfg.list(System.out);
  *     }
  * </pre>
- * <p>These methods will print the list of properties, see {@link java.util.Properties#list(java.io.PrintStream)} and
- * {@link java.util.Properties#list(java.io.PrintWriter)}.</p>
+ * <p>These methods will print the list of properties, see {@link java.util.Map#toString()}.</p>
  *
  * @author Luigi R. Viggiano
  * @since 1.0.4
@@ -40,7 +39,7 @@ public interface Accessible extends Config {
      * @param out an output stream.
      * @throws IOException 
      * @throws ClassCastException if any key in this property list is not a string.
-     * @see java.util.Properties#list(java.io.PrintStream)
+     * @see java.util.Map#toString()
      * @since 1.0.4
      */
     void list(PrintStream out) throws IOException;
@@ -50,7 +49,7 @@ public interface Accessible extends Config {
      *
      * @param out an output stream.
      * @throws ClassCastException if any key in this property list is not a string.
-     * @see java.util.Properties#list(java.io.PrintWriter)
+     * @see java.util.Map#toString()
      * @since 1.0.4
      */
     void list(PrintWriter out);
@@ -63,7 +62,7 @@ public interface Accessible extends Config {
      *
      * @param   key   the property key.
      * @return  the value in this property list with the specified key value.
-     * @see     java.util.Properties#getProperty(String)
+     * @see     OwnerProperties#get(String)
      * @since 1.0.4
      */
     Object getProperty(String key);
@@ -77,7 +76,7 @@ public interface Accessible extends Config {
      * @param   key            the property key.
      * @param   defaultValue   a default value.
      * @return  the value in this property list with the specified key value.
-     * @see java.util.Properties#getProperty(String, String)
+     * @see OwnerProperties#get(String)
      *
      * @since 1.0.4
      */
@@ -85,21 +84,19 @@ public interface Accessible extends Config {
 
     /**
      * Returns a set of keys in this property list
-     * including distinct keys in the default property list if a key
+     * including distinct keys in the default property list if a keys
      * of the same name has not already been found from the main
      * properties list.
      * <p>
-     * The returned set is not backed by the <tt>Properties</tt> object.
-     * Changes to this <tt>Properties</tt> are not reflected in the set,
+     * The returned set is not backed by the <tt>OwnerProperties</tt> object.
+     * Changes to this <tt>OwnerProperties</tt> are not reflected in the set,
      * or vice versa.
      *
      * @return  a set of keys in this property list, including the keys in the
      *          default property list.
      * @throws  ClassCastException if any key in this property list
      *          is not a string.
-     * @see     java.util.Properties#defaults
-     * @see     java.util.Properties#stringPropertyNames()
-     * @see     java.util.Properties#propertyNames()
+     * @see     OwnerProperties#keySetRecursive()
      * @since   1.0.5
      */
     Set<String> propertyNames();

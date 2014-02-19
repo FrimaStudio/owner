@@ -12,12 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.Properties;
 
 import org.aeonbits.owner.OwnerProperties;
 
 /**
- * Defines the interface of a generic Properties loader.
+ * Defines the interface of a generic loader.
  *
  * @author Luigi R. Viggiano
  * @since 1.0.5
@@ -34,7 +33,7 @@ public interface Loader extends Serializable {
     boolean accept(URL url);
 
     /**
-     * Loads the given {@link InputStream input} into the given {@link Properties result}
+     * Loads the given {@link InputStream input} into the given {@link OwnerProperties result}
      *
      * @since 1.0.5
      * @param result    the resulting properties where to load the {@link InputStream input}

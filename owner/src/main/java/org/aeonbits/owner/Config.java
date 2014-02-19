@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
  * user to programmatically reload properties.
  *
  * @author Luigi R. Viggiano
- * @see java.util.Properties
  */
 public interface Config extends Serializable {
 

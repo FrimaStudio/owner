@@ -18,7 +18,7 @@ import org.aeonbits.owner.loaders.Loader;
 /**
  * A static factory class to instantiate {@link Config} instances.
  * <p/>
- * By default a {link Config} sub-interface is associated to a property having the same package name and class name as
+ * By default a {@link Config} sub-interface is associated to a property having the same package name and class name as
  * the interface itself.
  * <p/>
  * Method names are mapped to property names contained in the property files.

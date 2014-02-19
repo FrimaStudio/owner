@@ -1,8 +1,10 @@
-/** This file and its contents are confidential and intended solely for the use of Frima Studio or outside parties permitted to view this file and its contents
- * per agreement between Frima Studio and said parties. Unauthorized publication, use, dissemination, forwarding, printing or copying of this file and its
- * contents is strictly prohibited.
- * 
- * Copyright (c) 2014 Frima Studio Inc. All Rights Reserved */
+/*
+ * Copyright (c) 2013, Luigi R. Viggiano
+ * All rights reserved.
+ *
+ * This software is distributable under the BSD license.
+ * See the terms of the BSD license in the documentation provided with this software.
+ */
 package org.aeonbits.owner;
 
 import static org.aeonbits.owner.Util.propertiesToMap;
@@ -18,11 +20,24 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
+ * <p>
+ * Container for loaded properties. This is only a simple wrapper around an {@link HashMap<String, Object>} that allows pretty
+ * much any type of configuration (from a '.properties' file to JSON, XML and YAML) that can be stored as a HashMap<String, ? extends Object>
+ * to be stored and accessed.
+ * </p>
+ * <p>
+ * Known issues : 
+ *      - The {@link #containsKey(String)} method currently isn't recursive (dotted properties might not be found)
+ * </p>
+ * 
  * @author Fred Deschenes
  */
 public class OwnerProperties extends HashMap<String, Object> {
     private static final long serialVersionUID = -8284376889570756605L;
 
+    /**
+     * Separator for dotted (ex: "my.property") property keys
+     */
     public final static String KEY_SEPARATOR = ".";
 
     /**
@@ -47,7 +62,7 @@ public class OwnerProperties extends HashMap<String, Object> {
     }
 
     /**
-     * @see HashMap#HashMap(Map<>)
+     * @see HashMap#HashMap(Map)
      */
     public OwnerProperties(Map<? extends String, ? extends Object> m) {
         super(m);
@@ -101,13 +116,15 @@ public class OwnerProperties extends HashMap<String, Object> {
         return false;
     }
 
+    /**
+     * WARNING: This currently is not recursive, so asking for a 'dotted' key (ex: "my.config.key") will not work in certain conditions.
+     * @param key       The key to search for
+     * @see Map#containsKey(Object)
+     */
     public boolean containsKey(String key) {
-        if (super.containsKey(key)) {
-            return true;
-        }
-
         //TODO: Fix recursive keys (without breaking resolve and merge methods)
-        return false;
+        //We could use 'keySetRecursive().contains', but that'd be pretty slow
+        return super.containsKey(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -130,6 +147,9 @@ public class OwnerProperties extends HashMap<String, Object> {
         return null;
     }
 
+    /**
+     * @see Map#putAll(Map)
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void putAll(Map<? extends String, ? extends Object> from) {
@@ -154,6 +174,9 @@ public class OwnerProperties extends HashMap<String, Object> {
         }
     }
 
+    /**
+     * @see     Map#keySet()
+     */
     public Set<String> keySetRecursive() {
         Set<String> keySet = new LinkedHashSet<String>();
 
@@ -181,11 +204,16 @@ public class OwnerProperties extends HashMap<String, Object> {
             return suffix;
         }
 
-        return prefix + KEY_SEPARATOR + suffix;
+        return new StringBuilder(prefix).append(KEY_SEPARATOR).append(suffix).toString();
     }
 
+    /**
+     * Dumps the backing Map object to the specified PrintStream
+     * @param out       The stream to print to
+     * @throws IOException
+     */
     public void list(PrintStream out) throws IOException {
-        //TODO: Better formatting
+        //TODO: Better formatting?
 
         try {
             byte[] data = super.toString().getBytes("UTF-8");
@@ -196,6 +224,10 @@ public class OwnerProperties extends HashMap<String, Object> {
         }
     }
 
+    /**
+     * Dumps the backing Map object to the specified PrintWriter
+     * @param out       The writer to write to
+     */
     public void list(PrintWriter out) {
         //TODO: Better formatting
         out.write(super.toString());

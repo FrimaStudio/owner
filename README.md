@@ -10,6 +10,21 @@ OWNER, an API to ease Java property files usage.
 [![Built with Maven](http://maven.apache.org/images/logos/maven-feather.png)](http://owner.newinstance.it/maven-site/)
 [![Powered by Sonar](http://sheldon.dyndns.tv:9000/images/sonar.png)](http://sheldon.dyndns.tv:9000/dashboard/index/1)
 
+Build pre-requisites
+------------
+- Maven (tested with 3.1.1, older/newer versions should also work)
+
+Generate Eclipse project
+------------
+Run 'mvn -npr eclipse:eclipse'.
+
+YAML
+------------
+This fork was created to implement YAML loading/parsing into OWNER. To do so, we sadly had to let go of some features that we didn't need and didn't have time to port:
+- XML configurations are not supported anymore. '.properties' should still work but are not used outside of the unit tests.
+- Accessible interface does not have the 'store' method anymore since it's currently impossible to know which format the properties should be saved as. This sadly break a lot of unit tests that relied on properties being able to be saved at runtime :(
+- Documentation outdated in some places (Should not really impact users of the library though).
+
 INTRODUCTION
 ------------
 

@@ -9,8 +9,12 @@
 package org.aeonbits.owner;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.aeonbits.owner.Config.DefaultValue;
+import org.aeonbits.owner.Config.DefaultValues;
 import org.aeonbits.owner.Config.Key;
 
 /**
@@ -29,21 +33,42 @@ final class PropertiesMapper {
         return (key == null) ? method.getName() : key.value();
     }
 
-    static String defaultValue(Method method) {
+    static Object defaultValue(Method method) {
         DefaultValue defaultValue = method.getAnnotation(DefaultValue.class);
-        return defaultValue != null ? defaultValue.value() : null;
+
+        if (defaultValue != null) {
+            return defaultValue.value();
+        }
+
+        DefaultValues defaultValues = method.getAnnotation(DefaultValues.class);
+
+        if (defaultValues != null) {
+
+            if (!method.getReturnType().isAssignableFrom(List.class)) {
+                throw new RuntimeException(""); //TODO
+            }
+
+            return defaultValues.value();
+        }
+
+        return null;
     }
 
     static void defaults(OwnerProperties properties, Class<? extends Config> clazz) {
         Method[] methods = clazz.getMethods();
+
+        Map<String, Object> defaults = new HashMap<String, Object>();
 
         for (Method method : methods) {
             String key = key(method);
             Object value = defaultValue(method);
 
             if (value != null) {
-                properties.put(key, value);
+                defaults.put(key, value);
+
             }
         }
+
+        properties.putAll(defaults);
     }
 }

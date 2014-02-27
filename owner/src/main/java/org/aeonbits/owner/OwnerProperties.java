@@ -170,7 +170,28 @@ public class OwnerProperties extends HashMap<String, Object> {
                 }
             }
 
-            into.put(key, fromValue);
+            if (key.contains(KEY_SEPARATOR)) {
+                String[] splitKeyItems = key.split("\\" + KEY_SEPARATOR);
+                Map<String, Object> root = new HashMap<String, Object>();
+                Map<String, Object> current = root;
+
+                int length = splitKeyItems.length;
+
+                for (int i = 0; i < length - 1; i++) {
+                    Map<String, Object> newMap = new HashMap<String, Object>();
+
+                    current.put(splitKeyItems[i], newMap);
+
+                    current = newMap;
+                }
+
+                current.put(splitKeyItems[splitKeyItems.length - 1], fromValue);
+
+                merge(root, into);
+
+            } else {
+                into.put(key, fromValue);
+            }
         }
     }
 

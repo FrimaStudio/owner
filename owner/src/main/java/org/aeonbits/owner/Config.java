@@ -76,6 +76,16 @@ public interface Config extends Serializable {
     }
 
     /**
+     * Default values to be used if no property is found.
+     */
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    @Documented
+    @interface DefaultValues {
+        String[] value();
+    }
+
+    /**
      * The key used for lookup for the property.  If not present, the key will be generated based on the unqualified
      * method name.
      */

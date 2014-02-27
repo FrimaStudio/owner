@@ -385,7 +385,9 @@ class PropertiesManager implements Reloadable, Accessible {
     }
 
     private Object performSetProperty(String key, Object value) {
-        return (value == null) ? performRemoveProperty(key) : asString(properties.put(key, value));
+        //FIXME: See MANTICORE-3844 in JIRA
+        // return (value == null) ? performRemoveProperty(key) : asString(properties.put(key, value));
+        return asString(properties.put(key, value));
     }
 
     @Delegate

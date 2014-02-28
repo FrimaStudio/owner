@@ -116,8 +116,8 @@ public class AccessibleConfigTest {
     public void testStringPropertyNames() throws Throwable {
         AccessibleConfig cfg = ConfigFactory.create(AccessibleConfig.class);
         Set<String> propNames = cfg.propertyNames();
-        assertThat(propNames.size(), is(2));
-        assertThat(propNames, containsInAnyOrder("favoriteSong", "salutation.text"));
+        assertThat(propNames.size(), is(3));
+        assertThat(propNames, containsInAnyOrder("favoriteSong", "salutation", "salutation.text"));
     }
 
 }

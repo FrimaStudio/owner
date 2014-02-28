@@ -37,6 +37,6 @@ public class ToStringTest {
     public void toStringTest() {
         MyConfig cfg = ConfigFactory.create(MyConfig.class);
 
-        assertEquals("{max.threads=25, default.name=untitled, max.folders=99}", cfg.toString());
+        assertEquals("{default={name=untitled}, max={threads=25, folders=99}}", cfg.toString());
     }
 }

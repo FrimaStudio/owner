@@ -8,9 +8,9 @@
 
 package org.aeonbits.owner;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * @author Luigi R. Viggiano
@@ -35,8 +35,8 @@ public class ConfigWithSubstitutionTest {
 
     @Test
     public void testSubInterface() {
-        ConfigWithSubtstitutionAnnotationsSubInterface conf = ConfigFactory.create
-                (ConfigWithSubtstitutionAnnotationsSubInterface.class);
+        ConfigWithSubtstitutionAnnotationsSubInterface conf = ConfigFactory
+                .create(ConfigWithSubtstitutionAnnotationsSubInterface.class);
         assertEquals("Please grandma, tell me the story of 'The quick brown fox jumped over the lazy dog'",
                 conf.tellmeTheStory());
     }
@@ -57,10 +57,10 @@ public class ConfigWithSubstitutionTest {
         @DefaultValue("quick ${color} fox")
         String animal();
 
-        @DefaultValue("${target.attribute} dog")
+        @DefaultValue("${attribute} dog")
         String target();
 
-        @Key("target.attribute")
+        @Key("attribute")
         @DefaultValue("lazy")
         String targetAttribute();
 

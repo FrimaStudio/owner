@@ -110,15 +110,21 @@ enum Converters {
     },
 
     COLLECTION {
+        @SuppressWarnings("unchecked")
         @Override
         Object tryConvert(Method targetMethod, Class<?> targetType, Object value) {
+            if (value == null)
+                return null;
+
             if (!Collection.class.isAssignableFrom(targetType))
                 return null;
 
             Collection<Object> collection;
 
-            if (value.getClass().isArray() || List.class.isAssignableFrom(value.getClass())) {
-                collection = Arrays.asList(value);
+            if (value instanceof Collection<?>) {
+                collection = (Collection<Object>) value;
+            } else if (value.getClass().isArray()) {
+                collection = Arrays.asList((Object[]) value);
             } else if (value instanceof String) {
                 collection = Arrays.asList(convertToArray(targetMethod, (String) value));
             } else {

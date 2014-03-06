@@ -14,9 +14,35 @@ import java.net.URL;
 /**
  * @author Luigi R. Viggiano
  */
-class ConfigURLFactory {
+public class ConfigURLFactory {
+
+    /**
+     * Interface to allow 'resources:' sources to be loaded using an external path formatting/searching
+     */
+    public static interface ResourcesPathResolver {
+        /**
+         * Resolves the correct path to use for a specified path, null if not valid/found
+         * @param path  The path to find
+         * @return      The found path or null
+         */
+        public String resolvePath(String path);
+    }
+
+    private static ResourcesPathResolver resourcePathResolver;
+
+    /**
+     * Sets the {@link ResourcesPathResolver} to use to resolve paths.
+     * @param resolver    The getter to set
+     */
+    public static void setResourcePathGetter(ResourcesPathResolver resolver) {
+        synchronized (ConfigURLFactory.class) {
+            resourcePathResolver = resolver;
+        }
+    }
 
     private static final String CLASSPATH_PROTOCOL = "classpath:";
+    private static final String RESOURCES_PROTOCOL = "resources:";
+
     private final transient ClassLoader classLoader;
     private final VariablesExpander expander;
 
@@ -33,6 +59,20 @@ class ConfigURLFactory {
             url = classLoader.getResource(path);
             if (url == null)
                 return null;
+        } else if (expanded.startsWith(RESOURCES_PROTOCOL)) {
+            ResourcesPathResolver resolver = resourcePathResolver;
+            if (resolver == null) {
+                throw Util.unsupported("ConfigURLFactory resourcePathGetter not set.");
+            }
+
+            String path = expanded.substring(RESOURCES_PROTOCOL.length());
+            String resolvedPath = resolver.resolvePath(path);
+
+            if (resolvedPath != null) {
+                url = new URL(resolvedPath);
+            } else {
+                return null;
+            }
         } else {
             url = new URL(expanded);
         }

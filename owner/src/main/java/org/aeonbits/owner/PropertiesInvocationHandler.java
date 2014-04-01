@@ -95,7 +95,8 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
     }
 
     private Object format(Method method, Object format, Object... args) {
-        if (isFeatureDisabled(method, PARAMETER_FORMATTING) || args.length == 0 || !(format instanceof String))
+        if (isFeatureDisabled(method, PARAMETER_FORMATTING) || args == null || args.length == 0
+                || !(format instanceof String))
             return format;
 
         return String.format((String) format, args);

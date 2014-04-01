@@ -12,7 +12,7 @@
 
     <groupId>org.aeonbits.owner</groupId>
     <artifactId>owner-parent</artifactId>
-    <version>1.0.6-Frima-SNAPSHOT</version>
+    <version>1.0.7-Frima-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OWNER :: Parent</name>

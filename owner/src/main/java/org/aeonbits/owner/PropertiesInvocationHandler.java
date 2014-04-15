@@ -9,6 +9,7 @@
 package org.aeonbits.owner;
 
 import static org.aeonbits.owner.Config.DisableableFeature.PARAMETER_FORMATTING;
+import static org.aeonbits.owner.Config.DisableableFeature.RESULT_CACHING;
 import static org.aeonbits.owner.Config.DisableableFeature.VARIABLE_EXPANSION;
 import static org.aeonbits.owner.Converters.convert;
 import static org.aeonbits.owner.PropertiesMapper.key;
@@ -19,10 +20,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.aeonbits.owner.PropertiesManager.Delegate;
+import org.aeonbits.owner.event.ReloadEvent;
+import org.aeonbits.owner.event.ReloadListener;
 
 /**
  * This {@link InvocationHandler} receives method calls from the delegate instantiated by {@link ConfigFactory} and maps
@@ -42,8 +47,19 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
     private final StrSubstitutor substitutor;
     final PropertiesManager propertiesManager;
 
+    private final Map<String, Object> preresolvedProperties = new HashMap<String, Object>();
+
     PropertiesInvocationHandler(PropertiesManager manager) {
         this.propertiesManager = manager;
+
+        this.propertiesManager.addReloadListener(new ReloadListener() {
+            public void reloadPerformed(ReloadEvent event) {
+                synchronized (preresolvedProperties) {
+                    preresolvedProperties.clear();
+                }
+            }
+        });
+
         this.substitutor = new StrSubstitutor(manager.load());
     }
 
@@ -78,12 +94,34 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
 
     private Object resolveProperty(Method method, Object... args) {
         String key = expandKey(method);
-        Object value = propertiesManager.getProperty(key);
+
+        boolean cachingEnabled = !isFeatureDisabled(method, RESULT_CACHING);
+
+        Object value = null;
+
+        if (args.length == 0 && cachingEnabled) {
+            synchronized (preresolvedProperties) {
+                value = preresolvedProperties.get(key);
+            }
+
+            if (value != null)
+                return value;
+        }
+
+        value = propertiesManager.getProperty(key);
         if (value == null)
             return null;
+
         Object result = convert(method, method.getReturnType(), format(method, expandVariables(method, value), args));
         if (result == Converters.NULL)
             return null;
+
+        if (cachingEnabled) {
+            synchronized (preresolvedProperties) {
+                preresolvedProperties.put(key, result);
+            }
+        }
+
         return result;
     }
 

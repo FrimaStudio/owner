@@ -253,7 +253,11 @@ public interface Config extends Serializable {
      * @since 1.0.4
      */
     enum DisableableFeature {
-        VARIABLE_EXPANSION, PARAMETER_FORMATTING
+        VARIABLE_EXPANSION, PARAMETER_FORMATTING,
+        /**
+         * Disables caching of computed property values.
+         */
+        RESULT_CACHING
     }
 
     /**

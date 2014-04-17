@@ -15,6 +15,8 @@ import static org.aeonbits.owner.Converters.convert;
 import static org.aeonbits.owner.PropertiesMapper.key;
 import static org.aeonbits.owner.Util.isFeatureDisabled;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -60,6 +62,14 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
             }
         });
 
+        this.propertiesManager.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                synchronized (preresolvedProperties) {
+                    preresolvedProperties.remove(evt.getPropertyName());
+                }
+            }
+        });
+
         this.substitutor = new StrSubstitutor(manager.load());
     }
 
@@ -99,7 +109,7 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
 
         Object value = null;
 
-        if (args.length == 0 && cachingEnabled) {
+        if ((args == null || args.length == 0) && cachingEnabled) {
             synchronized (preresolvedProperties) {
                 value = preresolvedProperties.get(key);
             }

@@ -97,6 +97,16 @@ public interface Config extends Serializable {
     }
 
     /**
+     * Prefix for a configuration's keys. If present, every key in the configuration will be prefixed by {@link #value()}.
+     */
+    @Retention(RUNTIME)
+    @Target(TYPE)
+    @Documented
+    @interface Group {
+        String value();
+    }
+
+    /**
      * Specifies the policy type to use to load the {@link org.aeonbits.owner.Config.Sources} files for properties.
      *
      * @since 1.0.2

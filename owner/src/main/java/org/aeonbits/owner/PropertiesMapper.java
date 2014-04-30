@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.aeonbits.owner.Config.DefaultValue;
 import org.aeonbits.owner.Config.DefaultValues;
+import org.aeonbits.owner.Config.Group;
 import org.aeonbits.owner.Config.Key;
 
 /**
@@ -24,13 +25,29 @@ import org.aeonbits.owner.Config.Key;
  */
 final class PropertiesMapper {
 
+    static final String KEY_SEPARATOR = ".";
+
     /** Don't let anyone instantiate this class */
     private PropertiesMapper() {
     }
 
     static String key(Method method) {
         Key key = method.getAnnotation(Key.class);
-        return (key == null) ? method.getName() : key.value();
+
+        Class<?> declaringClass = method.getDeclaringClass();
+        Group group = declaringClass.getAnnotation(Group.class);
+
+        String suffix = (key == null) ? method.getName() : key.value();
+
+        if (group == null)
+            return suffix;
+
+        String prefix = group.value();
+
+        if (!prefix.endsWith(KEY_SEPARATOR))
+            prefix += KEY_SEPARATOR;
+
+        return prefix + suffix;
     }
 
     static Object defaultValue(Method method) {

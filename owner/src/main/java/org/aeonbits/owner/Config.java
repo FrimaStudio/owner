@@ -20,6 +20,7 @@ import static org.aeonbits.owner.Util.reverse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.net.URL;
@@ -47,6 +48,7 @@ public interface Config extends Serializable {
     @Retention(RUNTIME)
     @Target(TYPE)
     @Documented
+    @Inherited
     @interface LoadPolicy {
         LoadType value() default FIRST;
     }
@@ -61,6 +63,7 @@ public interface Config extends Serializable {
     @Retention(RUNTIME)
     @Target(TYPE)
     @Documented
+    @Inherited
     @interface Sources {
         String[] value();
     }
@@ -102,6 +105,7 @@ public interface Config extends Serializable {
     @Retention(RUNTIME)
     @Target(TYPE)
     @Documented
+    @Inherited
     @interface Group {
         String value();
     }

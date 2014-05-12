@@ -48,11 +48,13 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
     private static final Method[] DELEGATES = findDelegates();
     private final StrSubstitutor substitutor;
     final PropertiesManager propertiesManager;
+    private final Class<? extends Config> configClass;
 
     private final Map<String, Object> preresolvedProperties = new HashMap<String, Object>();
 
-    PropertiesInvocationHandler(PropertiesManager manager) {
+    PropertiesInvocationHandler(PropertiesManager manager, Class<? extends Config> configClass) {
         this.propertiesManager = manager;
+        this.configClass = configClass;
 
         this.propertiesManager.addReloadListener(new ReloadListener() {
             public void reloadPerformed(ReloadEvent event) {
@@ -136,7 +138,7 @@ class PropertiesInvocationHandler implements InvocationHandler, Serializable {
     }
 
     private String expandKey(Method method) {
-        String key = key(method);
+        String key = key(method, configClass);
         if (isFeatureDisabled(method, VARIABLE_EXPANSION))
             return key;
         return substitutor.replace(key);

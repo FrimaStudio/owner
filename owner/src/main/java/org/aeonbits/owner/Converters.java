@@ -183,12 +183,17 @@ enum Converters {
             if (!(value instanceof String))
                 return null;
 
+            String cast = (String) value;
+
+            if (cast.isEmpty())
+                return null;
+
             PropertyEditor editor = PropertyEditorManager.findEditor(targetType);
 
             if (editor == null)
                 return null;
 
-            editor.setAsText((String) value);
+            editor.setAsText(cast);
             return editor.getValue();
         }
     },

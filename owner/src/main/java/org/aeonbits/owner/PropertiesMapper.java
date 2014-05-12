@@ -8,6 +8,8 @@
 
 package org.aeonbits.owner;
 
+import static org.aeonbits.owner.Util.getAnnotationCheckInterfaces;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -31,11 +33,10 @@ final class PropertiesMapper {
     private PropertiesMapper() {
     }
 
-    static String key(Method method) {
-        Key key = method.getAnnotation(Key.class);
+    static String key(Method method, Class<? extends Config> configClass) {
+        Key key = getAnnotationCheckInterfaces(method, Key.class);
 
-        Class<?> declaringClass = method.getDeclaringClass();
-        Group group = declaringClass.getAnnotation(Group.class);
+        Group group = getAnnotationCheckInterfaces(configClass, Group.class);
 
         String suffix = (key == null) ? method.getName() : key.value();
 
@@ -51,13 +52,13 @@ final class PropertiesMapper {
     }
 
     static Object defaultValue(Method method) {
-        DefaultValue defaultValue = method.getAnnotation(DefaultValue.class);
+        DefaultValue defaultValue = getAnnotationCheckInterfaces(method, DefaultValue.class);
 
         if (defaultValue != null) {
             return defaultValue.value();
         }
 
-        DefaultValues defaultValues = method.getAnnotation(DefaultValues.class);
+        DefaultValues defaultValues = getAnnotationCheckInterfaces(method, DefaultValues.class);
 
         if (defaultValues != null) {
 
@@ -77,7 +78,7 @@ final class PropertiesMapper {
         Map<String, Object> defaults = new HashMap<String, Object>();
 
         for (Method method : methods) {
-            String key = key(method);
+            String key = key(method, clazz);
             Object value = defaultValue(method);
 
             if (value != null) {

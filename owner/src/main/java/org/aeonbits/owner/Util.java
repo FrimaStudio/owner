@@ -14,6 +14,7 @@ import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -104,8 +105,8 @@ abstract class Util {
 
     static boolean isFeatureDisabled(Method method, DisableableFeature feature) {
         Class<DisableFeature> annotation = DisableFeature.class;
-        return isFeatureDisabled(feature, method.getDeclaringClass().getAnnotation(annotation))
-                || isFeatureDisabled(feature, method.getAnnotation(annotation));
+        return isFeatureDisabled(feature, getAnnotationCheckInterfaces(method.getDeclaringClass(), annotation))
+                || isFeatureDisabled(feature, getAnnotationCheckInterfaces(method, annotation));
     }
 
     private static boolean isFeatureDisabled(DisableableFeature feature, DisableFeature annotation) {
@@ -176,4 +177,50 @@ abstract class Util {
         return container;
     }
 
+    public static <T extends Annotation> T getAnnotationCheckInterfaces(Method method, Class<T> annotationClass) {
+
+        T annotation = method.getAnnotation(annotationClass);
+
+        if (annotation != null)
+            return annotation;
+
+        Class<?> declaringClass = method.getDeclaringClass();
+        Class<?>[] interfaces = declaringClass.getInterfaces();
+
+        for (Class<?> interfazz : interfaces) {
+            if (Config.class.isAssignableFrom(interfazz)) {
+                try {
+                    Method interfaceMethod = interfazz.getMethod(method.getName(), method.getParameterTypes());
+                    annotation = getAnnotationCheckInterfaces(interfaceMethod, annotationClass);
+
+                    if (annotation != null)
+                        return annotation;
+                } catch (Exception e) {
+
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static <T extends Annotation> T getAnnotationCheckInterfaces(Class<?> clazz, Class<T> annotationClass) {
+        T annotation = clazz.getAnnotation(annotationClass);
+
+        if (annotation != null)
+            return annotation;
+
+        Class<?>[] interfaces = clazz.getInterfaces();
+
+        for (Class<?> interfazz : interfaces) {
+            if (Config.class.isAssignableFrom(interfazz)) {
+                annotation = getAnnotationCheckInterfaces(interfazz, annotationClass);
+
+                if (annotation != null)
+                    return annotation;
+            }
+        }
+
+        return null;
+    }
 }

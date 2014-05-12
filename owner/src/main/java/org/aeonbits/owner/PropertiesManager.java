@@ -15,6 +15,7 @@ import static org.aeonbits.owner.Config.LoadType.FIRST;
 import static org.aeonbits.owner.PropertiesMapper.defaults;
 import static org.aeonbits.owner.Util.asString;
 import static org.aeonbits.owner.Util.eq;
+import static org.aeonbits.owner.Util.getAnnotationCheckInterfaces;
 import static org.aeonbits.owner.Util.ignore;
 import static org.aeonbits.owner.Util.reverse;
 import static org.aeonbits.owner.Util.unsupported;
@@ -108,12 +109,12 @@ class PropertiesManager implements Reloadable, Accessible {
         this.imports = imports;
 
         ConfigURLFactory urlFactory = new ConfigURLFactory(clazz.getClassLoader(), expander);
-        urls = toURLs(clazz.getAnnotation(Sources.class), urlFactory);
+        urls = toURLs(getAnnotationCheckInterfaces(clazz, Sources.class), urlFactory);
 
-        LoadPolicy loadPolicy = clazz.getAnnotation(LoadPolicy.class);
+        LoadPolicy loadPolicy = getAnnotationCheckInterfaces(clazz, LoadPolicy.class);
         loadType = (loadPolicy != null) ? loadPolicy.value() : FIRST;
 
-        HotReload hotReload = clazz.getAnnotation(HotReload.class);
+        HotReload hotReload = getAnnotationCheckInterfaces(clazz, HotReload.class);
         if (hotReload != null) {
             hotReloadLogic = new HotReloadLogic(hotReload, urls, this);
 

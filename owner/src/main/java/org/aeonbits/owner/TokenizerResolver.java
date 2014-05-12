@@ -8,12 +8,13 @@
 
 package org.aeonbits.owner;
 
-import org.aeonbits.owner.Config.Separator;
-import org.aeonbits.owner.Config.TokenizerClass;
+import static org.aeonbits.owner.Util.getAnnotationCheckInterfaces;
+import static org.aeonbits.owner.Util.unsupported;
 
 import java.lang.reflect.Method;
 
-import static org.aeonbits.owner.Util.unsupported;
+import org.aeonbits.owner.Config.Separator;
+import org.aeonbits.owner.Config.TokenizerClass;
 
 /**
  * @author Luigi R. Viggiano
@@ -21,7 +22,8 @@ import static org.aeonbits.owner.Util.unsupported;
 final class TokenizerResolver {
 
     /** Don't let anyone instantiate this class */
-    private TokenizerResolver() {}
+    private TokenizerResolver() {
+    }
 
     private static final Tokenizer DEFAULT_TOKENIZER = new SplitAndTrimTokenizer(",");
 
@@ -38,8 +40,9 @@ final class TokenizerResolver {
     }
 
     private static Tokenizer resolveTokenizerOnClassLevel(Class<?> declaringClass) {
-        Separator separatorAnnotationOnClassLevel = declaringClass.getAnnotation(Separator.class);
-        TokenizerClass tokenizerClassAnnotationOnClassLevel = declaringClass.getAnnotation(TokenizerClass.class);
+        Separator separatorAnnotationOnClassLevel = getAnnotationCheckInterfaces(declaringClass, Separator.class);
+        TokenizerClass tokenizerClassAnnotationOnClassLevel = getAnnotationCheckInterfaces(declaringClass,
+                TokenizerClass.class);
 
         if (separatorAnnotationOnClassLevel != null && tokenizerClassAnnotationOnClassLevel != null)
             throw unsupported(
@@ -56,8 +59,9 @@ final class TokenizerResolver {
     }
 
     private static Tokenizer resolveTokenizerOnMethodLevel(Method targetMethod) {
-        Separator separatorAnnotationOnMethodLevel = targetMethod.getAnnotation(Separator.class);
-        TokenizerClass tokenizerClassAnnotationOnMethodLevel = targetMethod.getAnnotation(TokenizerClass.class);
+        Separator separatorAnnotationOnMethodLevel = Util.getAnnotationCheckInterfaces(targetMethod, Separator.class);
+        TokenizerClass tokenizerClassAnnotationOnMethodLevel = Util.getAnnotationCheckInterfaces(targetMethod,
+                TokenizerClass.class);
 
         if (separatorAnnotationOnMethodLevel != null && tokenizerClassAnnotationOnMethodLevel != null)
             throw unsupported(
@@ -77,8 +81,7 @@ final class TokenizerResolver {
         try {
             return tokenizerClass.newInstance();
         } catch (Exception e) {
-            throw unsupported(e,
-                    "Tokenizer class '%s' cannot be instantiated; see the cause below in the stack trace",
+            throw unsupported(e, "Tokenizer class '%s' cannot be instantiated; see the cause below in the stack trace",
                     tokenizerClass.getCanonicalName());
         }
     }

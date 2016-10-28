@@ -10,6 +10,11 @@ package org.aeonbits.owner;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Luigi R. Viggiano
@@ -19,25 +24,25 @@ public class ConfigURLFactory {
     /**
      * Interface to allow 'resources:' sources to be loaded using an external path formatting/searching
      */
-    public static interface ResourcesPathResolver {
+    public interface ResourcesPathResolver {
         /**
          * Resolves the correct path to use for a specified path, null if not valid/found
-         * @param path  The path to find
-         * @return      The found path or null
+         *
+         * @param path The path to find
+         * @return The found paths or null
          */
-        public String resolvePath(String path);
+        Collection<String> resolvePath(String path);
     }
 
-    private static ResourcesPathResolver resourcePathResolver;
+    private static AtomicReference<ResourcesPathResolver> resourcePathResolver = new AtomicReference<ResourcesPathResolver>();
 
     /**
      * Sets the {@link ResourcesPathResolver} to use to resolve paths.
-     * @param resolver    The getter to set
+     *
+     * @param resolver The getter to set
      */
     public static void setResourcePathGetter(ResourcesPathResolver resolver) {
-        synchronized (ConfigURLFactory.class) {
-            resourcePathResolver = resolver;
-        }
+        resourcePathResolver.set(resolver);
     }
 
     private static final String CLASSPATH_PROTOCOL = "classpath:";
@@ -51,7 +56,7 @@ public class ConfigURLFactory {
         this.expander = expander;
     }
 
-    URL newURL(String spec) throws MalformedURLException {
+    Collection<URL> newURL(String spec) throws MalformedURLException {
         String expanded = expand(spec);
         URL url;
         if (expanded.startsWith(CLASSPATH_PROTOCOL)) {
@@ -60,22 +65,32 @@ public class ConfigURLFactory {
             if (url == null)
                 return null;
         } else if (expanded.startsWith(RESOURCES_PROTOCOL)) {
-            ResourcesPathResolver resolver = resourcePathResolver;
+            ResourcesPathResolver resolver = resourcePathResolver.get();
             if (resolver == null) {
                 throw Util.unsupported("ConfigURLFactory resourcePathGetter not set.");
             }
 
             String path = expanded.substring(RESOURCES_PROTOCOL.length());
-            String resolvedPath = resolver.resolvePath(path);
+            Collection<String> resolvedPaths = resolver.resolvePath(path);
 
-            if (resolvedPath != null) {
-                url = new URL(resolvedPath);
-            } else {
+            if (resolvedPaths == null || resolvedPaths.isEmpty()) {
                 return null;
             }
+
+            List<URL> urls = new ArrayList<URL>(resolvedPaths.size());
+
+            for (String resolvedPath : resolvedPaths) {
+                urls.add(cleanURL(new URL(resolvedPath)));
+            }
+
+            return urls;
         } else {
             url = new URL(expanded);
         }
+        return Collections.singletonList(cleanURL(url));
+    }
+
+    private URL cleanURL(URL url) throws MalformedURLException {
         return new URL(url.getProtocol(), url.getHost(), url.getPort(), expand(url.getPath()));
     }
 

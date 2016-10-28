@@ -8,17 +8,7 @@
 
 package org.aeonbits.owner;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static java.util.Collections.synchronizedList;
-import static org.aeonbits.owner.Config.LoadType.FIRST;
-import static org.aeonbits.owner.PropertiesMapper.defaults;
-import static org.aeonbits.owner.Util.asString;
-import static org.aeonbits.owner.Util.eq;
-import static org.aeonbits.owner.Util.getAnnotationCheckInterfaces;
-import static org.aeonbits.owner.Util.ignore;
-import static org.aeonbits.owner.Util.reverse;
-import static org.aeonbits.owner.Util.unsupported;
+import org.aeonbits.owner.event.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -32,27 +22,18 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.aeonbits.owner.event.ReloadEvent;
-import org.aeonbits.owner.event.ReloadListener;
-import org.aeonbits.owner.event.RollbackBatchException;
-import org.aeonbits.owner.event.RollbackException;
-import org.aeonbits.owner.event.RollbackOperationException;
-import org.aeonbits.owner.event.TransactionalPropertyChangeListener;
-import org.aeonbits.owner.event.TransactionalReloadListener;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.util.Collections.synchronizedList;
+import static org.aeonbits.owner.Config.LoadType.FIRST;
+import static org.aeonbits.owner.PropertiesMapper.defaults;
+import static org.aeonbits.owner.Util.*;
 
 /**
  * Loads properties and manages access to properties handling concurrency.
@@ -134,9 +115,9 @@ class PropertiesManager implements Reloadable, Accessible {
         ArrayList<URL> result = new ArrayList<URL>();
         for (String spec : specs) {
             try {
-                URL url = urlFactory.newURL(spec);
-                if (url != null)
-                    result.add(url);
+                Collection<URL> urls = urlFactory.newURL(spec);
+                if (urls != null)
+                    result.addAll(urls);
             } catch (MalformedURLException e) {
                 throw unsupported(e, "Can't convert '%s' to a valid URL", spec);
             }

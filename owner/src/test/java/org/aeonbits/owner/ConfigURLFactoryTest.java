@@ -8,12 +8,14 @@
 
 package org.aeonbits.owner;
 
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Luigi R. Viggiano
@@ -23,7 +25,8 @@ public class ConfigURLFactoryTest {
     public void shouldReturnAnURL() throws MalformedURLException {
         ConfigURLFactory h = new ConfigURLFactory(this.getClass().getClassLoader(), new VariablesExpander(
                 new OwnerProperties()));
-        URL url = h.newURL("classpath:test.properties");
-        assertNotNull(url);
+        Collection<URL> urls = h.newURL("classpath:test.properties");
+        assertNotNull(urls);
+        assertFalse(urls.isEmpty());
     }
 }
